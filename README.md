@@ -15,15 +15,9 @@ Depois disso, o app se atualiza sozinho: ao abrir, ele procura uma versão nova,
 
 1. Faça as mudanças (a interface fica em `src/template.html` e `src/base.css`).
 2. Aumente a versão em `package.json` (por exemplo `1.0.0` → `1.1.0`).
-3. Crie e envie a tag da versão:
+3. Envie para a branch `main`.
 
-   ```bash
-   git commit -am "Versão 1.1.0"
-   git tag v1.1.0
-   git push && git push --tags
-   ```
-
-O GitHub Actions monta o instalador num Windows e publica em Releases. Os apps instalados recebem a atualização na próxima vez que abrirem.
+O GitHub Actions percebe o número novo, monta o instalador num Windows e publica em Releases com a tag `v1.1.0`. Os apps instalados recebem a atualização na próxima vez que abrirem. Se o número não mudar, nada é publicado.
 
 ## Estrutura
 
@@ -35,7 +29,7 @@ O GitHub Actions monta o instalador num Windows e publica em Releases. Os apps i
 | `app/main.js` | Janela do Windows e atualização automática |
 | `app/icon.ico` | Ícone do app |
 | `build.js` | Gera `app/index.html` a partir de `src/` |
-| `.github/workflows/release.yml` | Monta e publica o instalador a cada tag `v*` |
+| `.github/workflows/release.yml` | Monta e publica o instalador quando a versão muda |
 
 ## Rodar no computador (desenvolvimento)
 
