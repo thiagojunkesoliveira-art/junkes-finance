@@ -2,6 +2,7 @@ const { app, BrowserWindow, Menu, shell, dialog, ipcMain } = require("electron")
 const { autoUpdater } = require("electron-updater");
 const path = require("path");
 const ia = require("./ia");
+const email = require("./email");
 
 if (!app.requestSingleInstanceLock()) app.quit();
 app.setAppUserModelId("com.junkes.finance");
@@ -51,6 +52,11 @@ ipcMain.handle("ia:status", () => ia.status());
 ipcMain.handle("ia:salvar-chave", (_e, chave) => ia.salvarChave(chave));
 ipcMain.handle("ia:remover-chave", () => ia.removerChave());
 ipcMain.handle("ia:aconselhar", (_e, resumo) => ia.aconselhar(resumo));
+ipcMain.handle("email:status", () => email.status());
+ipcMain.handle("email:salvar", (_e, d) => email.salvar(d && d.email, d && d.senha));
+ipcMain.handle("email:remover", () => email.remover());
+ipcMain.handle("email:verificar", () => email.verificar());
+ipcMain.handle("email:marcar", (_e, ids) => email.marcar(ids));
 
 app.whenReady().then(() => { criarJanela(); configurarAtualizacao(); });
 app.on("window-all-closed", () => app.quit());

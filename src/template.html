@@ -187,6 +187,15 @@ dialog#ed::backdrop { background: rgb(40 42 38 / .35); }
 .regras li:last-child { border-bottom: 0; }
 .regras li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .regras li span:nth-child(2) { color: var(--muted); font-size: 0.9rem; }
+.email-auto { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 0.92rem; color: var(--ink); border-top: 1px dashed var(--line); padding-top: 10px; }
+.email-auto > .mt-msg, .email-auto > .passos, .email-auto > .ia-chave, .email-auto > .hint, .email-auto > .err, .email-auto > .imp-actions { flex-basis: 100%; }
+.email-auto .passos { margin: 0; padding-left: 20px; color: var(--ink); }
+.email-auto .passos li { margin: 2px 0; }
+.email-auto .passos a { color: var(--pos); }
+.em-on { color: var(--pos); }
+.em-on::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--teal); margin-right: 7px; vertical-align: 1px; }
+.em-acoes { margin-left: auto; display: flex; gap: 14px; }
+.email-auto .hint, .email-auto .carregando { margin: 0; font-size: 0.88rem; }
 /* ===== Telas ===== */
 .view { display: grid; gap: 22px; }
 
@@ -589,8 +598,9 @@ dialog#ed::backdrop { background: rgb(40 42 38 / .35); }
         <span class="drop-txt"><b>Importar extrato do Inter</b><small>Arraste o arquivo .ofx ou .csv para cá ou clique para escolher</small></span>
       </label>
       <details class="imp-how"><summary>Como exportar o extrato no Inter?</summary>
-        <p class="imp-help">No app ou no Internet Banking do Inter, abra o <b>Extrato</b>, escolha o período e use a opção de exportar. Baixe em <b>OFX</b> ou <b>CSV</b> (PDF não serve). Lançamentos que já estão no app são reconhecidos e não entram duplicados.</p>
+        <p class="imp-help">No app ou no Internet Banking do Inter, abra o <b>Extrato</b>, escolha o período e use a opção de exportar. Baixe em <b>OFX</b> ou <b>CSV</b> (PDF não serve), ou escolha <b>enviar por e-mail</b> para o app importar sozinho. Lançamentos que já estão no app são reconhecidos e não entram duplicados.</p>
       </details>
+      <div class="email-auto" id="email-auto" hidden></div>
       <p class="err" id="imp-err" hidden></p>
       <div id="imp-prev" hidden style="display:grid;gap:12px">
         <div class="imp-row"><p class="imp-sum" id="imp-sum"></p>
@@ -910,8 +920,8 @@ function formaDe(texto) {
   if (/saque/.test(s)) return "Dinheiro";
   return "Transferência";
 }
-async function lerTexto(file) {
-  const buf = await file.arrayBuffer();
+async function lerTexto(file) { return decodificar(await file.arrayBuffer()); }
+function decodificar(buf) {
   let s;
   try { s = new TextDecoder("utf-8", { fatal: true }).decode(buf); }
   catch (e) { s = new TextDecoder("windows-1252").decode(buf); }
@@ -992,22 +1002,46 @@ function lerCSV(txt) {
 
 let pend = [], pendExemplo = false, pendSaldo = null;
 const chaveTx = t => `${t.data}|${t.tipo}|${t.valor.toFixed(2)}|${norm(t.desc)}`;
-function prepararImport(lido, exemplo) {
-  pendExemplo = exemplo;
-  const brutos = lido.itens;
-  pendSaldo = lido.saldo && (!conta || lido.saldo.data >= conta.data) ? lido.saldo : null;
-  const existentes = new Set(txs.map(chaveTx)), fits = new Set(txs.map(t => t.fitid).filter(Boolean));
-  pend = brutos.map(r => {
+/* Monta a lista de um extrato: categorias, regras, movimentações e duplicados */
+function montarImport(lido) {
+  const saldo = lido.saldo && (!conta || lido.saldo.data >= conta.data) ? lido.saldo : null;
+  const fits = new Set(txs.map(t => t.fitid).filter(Boolean));
+  const existentes = new Set(txs.map(chaveTx));
+  // Extratos que se sobrepõem: conta quantos lançamentos do Inter já existem com a mesma data, tipo e valor
+  const kk = t => `${t.data}|${t.tipo}|${t.valor.toFixed(2)}`;
+  const contagem = {};
+  txs.filter(t => t.origem === "Inter").forEach(t => contagem[kk(t)] = (contagem[kk(t)] || 0) + 1);
+  const itens = lido.itens.map(r => {
     const tipo = r.valor > 0 ? "entrada" : "saida";
     const t = { tipo, valor: Math.round(Math.abs(r.valor) * 100) / 100, desc: r.desc, data: r.data, cat: categoria(tipo, r.base), mov: false, forma: formaDe(r.base), fitid: r.fitid || "" };
     const rg = regraPara(r.desc), mv = movDe(r.base);
     if (regraServe(rg, tipo)) { t.cat = rg.cat; t.mov = rg.mov; t.regra = true; }
     else if (mv) { t.cat = mv; t.mov = true; }
-    t.dup = (t.fitid && fits.has(t.fitid)) || existentes.has(chaveTx(t));
+    const k = kk(t);
+    t.dup = (t.fitid && fits.has(t.fitid)) || existentes.has(chaveTx(t)) || contagem[k] > 0;
+    if (t.dup && contagem[k] > 0) contagem[k]--;
     t.on = !t.dup;
     return t;
   }).sort((a, b) => b.data.localeCompare(a.data));
+  return { itens, saldo };
+}
+function prepararImport(lido, exemplo) {
+  pendExemplo = exemplo;
+  const m = montarImport(lido);
+  pend = m.itens; pendSaldo = m.saldo;
   renderImport();
+}
+/* Grava lançamentos importados (tela de revisão ou e-mail) e devolve como desfazer */
+function gravarImport(sel, saldo, mudadas) {
+  const stamp = Date.now();
+  const antes = { conta, regras: [...regras] };
+  const novos = sel.map((t, i) => ({ id: `i${stamp}-${i}`, tipo: t.tipo, valor: t.valor, desc: t.desc, cat: t.cat, mov: t.mov || undefined, forma: t.forma, data: t.data, fitid: t.fitid || undefined, origem: "Inter", criado: stamp }));
+  mudadas.forEach(t => salvarRegra(t.desc, t.cat, t.mov));
+  if (saldo) conta = { valor: saldo.valor, data: saldo.data, criado: stamp + 1, origem: "extrato" };
+  txs.push(...novos);
+  save(); render(); renderRegras();
+  const ids = new Set(novos.map(t => t.id));
+  return { n: novos.length, desfazer: () => { txs = txs.filter(t => !ids.has(t.id)); conta = antes.conta; regras = antes.regras; renderRegras(); } };
 }
 function renderImport() {
   $("imp-prev").hidden = !pend.length;
@@ -1054,16 +1088,85 @@ $("imp-all").addEventListener("click", () => { pend.forEach(t => t.on = true); r
 $("imp-none").addEventListener("click", () => { pend.forEach(t => t.on = false); renderImport(); });
 $("imp-cancel").addEventListener("click", () => { pend = []; renderImport(); });
 $("imp-ok").addEventListener("click", () => {
-  const sel = pend.filter(t => t.on), stamp = Date.now();
-  const antes = { conta, regras: [...regras] };
-  const novos = sel.map((t, i) => ({ id: `i${stamp}-${i}`, tipo: t.tipo, valor: t.valor, desc: t.desc, cat: t.cat, mov: t.mov || undefined, forma: t.forma, data: t.data, fitid: t.fitid || undefined, origem: "Inter", criado: stamp }));
-  if ($("imp-lembrar").checked) pend.filter(t => t.mudou).forEach(t => salvarRegra(t.desc, t.cat, t.mov));
-  if (pendSaldo) conta = { valor: pendSaldo.valor, data: pendSaldo.data, criado: stamp + 1, origem: "extrato" };
-  txs.push(...novos);
-  pend = []; pendSaldo = null; save(); render(); renderImport(); renderRegras();
-  const ids = new Set(novos.map(t => t.id));
-  toast(`${novos.length} lançamento${novos.length > 1 ? "s" : ""} importado${novos.length > 1 ? "s" : ""} do Inter.`, () => { txs = txs.filter(t => !ids.has(t.id)); conta = antes.conta; regras = antes.regras; renderRegras(); });
+  const g = gravarImport(pend.filter(t => t.on), pendSaldo, $("imp-lembrar").checked ? pend.filter(t => t.mudou) : []);
+  pend = []; pendSaldo = null; renderImport();
+  toast(`${g.n} lançamento${g.n > 1 ? "s" : ""} importado${g.n > 1 ? "s" : ""} do Inter.`, g.desfazer);
 });
+
+/* ===== Importação automática pelo e-mail ===== */
+let emailSt = null, emailEstado = "", emailErro = "", emailUltima = null, emailForm = false;
+async function verificarEmail(manual) {
+  if (!window.junkes || !window.junkes.email) return;
+  emailSt = await window.junkes.email.status();
+  if (!emailSt.configurado) { renderEmail(); return; }
+  emailEstado = "verificando"; renderEmail();
+  const r = await window.junkes.email.verificar();
+  if (!r.ok) { emailEstado = "erro"; emailErro = r.erro; renderEmail(); return; }
+  let total = 0; const desfazer = [], ids = [];
+  for (const a of r.novos) {
+    ids.push(a.id);
+    const bin = atob(a.base64), bytes = new Uint8Array(bin.length);
+    for (let k = 0; k < bin.length; k++) bytes[k] = bin.charCodeAt(k);
+    const txt = decodificar(bytes.buffer);
+    const lido = /<OFX>|OFXHEADER/i.test(txt) ? lerOFX(txt) : lerCSV(txt);
+    if (!lido.itens.length) continue;
+    const m = montarImport(lido);
+    const g = gravarImport(m.itens.filter(t => t.on), m.saldo, []);
+    total += g.n; desfazer.push(g.desfazer);
+  }
+  if (ids.length) await window.junkes.email.marcar(ids);
+  emailUltima = new Date(); emailEstado = "ok"; renderEmail();
+  if (total) toast(`${total} lançamento${total > 1 ? "s" : ""} importado${total > 1 ? "s" : ""} do e-mail do Inter.`, () => desfazer.reverse().forEach(f => f()));
+  else if (manual) toast(r.novos.length ? "Os extratos novos não tinham lançamentos novos." : "Nenhum extrato novo no e-mail.");
+}
+function renderEmail() {
+  const box = $("email-auto");
+  if (!window.junkes || !window.junkes.email) { box.hidden = true; return; }
+  box.hidden = false;
+  if (!emailSt) { box.innerHTML = ""; return; }
+  if (!emailSt.configurado) {
+    box.innerHTML = emailForm ? `
+      <p class="mt-msg"><b>Importar sozinho pelo e-mail.</b> Peça o extrato por e-mail no app do Inter e o app importa assim que ele chegar no seu Gmail.</p>
+      <ol class="passos">
+        <li>Ative a verificação em duas etapas na sua Conta Google.</li>
+        <li>Crie uma senha de app em <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">myaccount.google.com/apppasswords</a> (nome: Junkes Finance).</li>
+        <li>Cole aqui o seu Gmail e a senha de 16 letras que o Google mostrar.</li>
+      </ol>
+      <div class="ia-chave"><div class="row">
+        <input id="em-email" type="email" placeholder="seuemail@gmail.com" autocomplete="off" aria-label="Seu Gmail">
+        <input id="em-senha" type="password" placeholder="Senha de app (16 letras)" autocomplete="off" aria-label="Senha de app do Google">
+      </div></div>
+      <p class="hint">A senha fica guardada criptografada neste computador. O app só procura os e-mails do Inter com o extrato. Você pode cancelar a senha de app no Google quando quiser.</p>
+      <p class="err" id="em-err" hidden></p>
+      <div class="imp-actions"><button class="primary" type="button" id="em-salvar" style="padding:9px 20px">Conectar e-mail</button><button class="ghost" type="button" id="em-cancelar">Cancelar</button></div>`
+      : `<span>Quer que o extrato entre sozinho? O app pode ler os extratos que o Inter manda para o seu e-mail.</span> <button class="link-btn" type="button" id="em-abrir">Configurar</button>`;
+    return;
+  }
+  const quando = emailUltima ? `Última verificação às ${emailUltima.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}.` : "";
+  box.innerHTML = `<span class="em-on">Importação pelo e-mail ativa em ${esc(emailSt.email)}.</span>
+    ${emailEstado === "verificando" ? `<span class="carregando">Procurando extratos novos...</span>` : emailEstado === "erro" ? `<span class="err" style="margin:0">${esc(emailErro)}</span>` : `<span class="hint">${quando}</span>`}
+    <span class="em-acoes"><button class="link-btn" type="button" id="em-verificar">Verificar agora</button> <button class="link-btn" type="button" id="em-remover" style="color:var(--muted)">Desativar</button></span>`;
+}
+$("email-auto").addEventListener("click", async e => {
+  const id = e.target.id;
+  if (id === "em-abrir") { emailForm = true; renderEmail(); $("em-email").focus(); }
+  else if (id === "em-cancelar") { emailForm = false; renderEmail(); }
+  else if (id === "em-salvar") {
+    e.target.disabled = true; e.target.textContent = "Conectando...";
+    const r = await window.junkes.email.salvar($("em-email").value, $("em-senha").value);
+    if (!r.ok) { e.target.disabled = false; e.target.textContent = "Conectar e-mail"; $("em-err").textContent = r.erro; $("em-err").hidden = false; return; }
+    emailForm = false; toast("E-mail conectado. Procurando extratos do Inter...");
+    verificarEmail(true);
+  }
+  else if (id === "em-verificar") verificarEmail(true);
+  else if (id === "em-remover") { await window.junkes.email.remover(); emailSt = null; emailEstado = ""; verificarEmail(false); }
+});
+if (window.junkes && window.junkes.email) {
+  setTimeout(() => verificarEmail(false), 3000);
+  setInterval(() => verificarEmail(false), 30 * 60 * 1000);
+  window.addEventListener("focus", () => { if (emailSt && emailSt.configurado && (!emailUltima || Date.now() - emailUltima > 10 * 60 * 1000)) verificarEmail(false); });
+}
+
 /* ===== Projeção ===== */
 const brlC = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 });
 const PJ_KEY = "junkes-finance-proj";
@@ -1669,6 +1772,7 @@ document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () =
 
 render();
 renderRegras();
+renderEmail();
 renderProj();
 rota();
 </script>

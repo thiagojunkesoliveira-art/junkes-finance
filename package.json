@@ -1,7 +1,7 @@
 {
   "name": "junkes-finance",
   "productName": "Junkes Finance",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Controle financeiro pessoal",
   "author": "Thiago Junkes",
   "license": "UNLICENSED",
@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.135.0",
-    "electron-updater": "6.3.9"
+    "electron-updater": "6.3.9",
+    "imapflow": "2.5.8",
+    "mailparser": "3.10.0"
   },
   "devDependencies": {
     "electron": "33.2.1",

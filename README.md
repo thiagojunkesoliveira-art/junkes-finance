@@ -11,6 +11,12 @@ Na primeira vez o Windows pode mostrar "O Windows protegeu o computador": clique
 
 Depois disso, o app se atualiza sozinho: ao abrir, ele procura uma versão nova, baixa e pergunta se você quer reiniciar.
 
+## Importação automática pelo e-mail
+
+No app do Inter, peça o extrato com **enviar por e-mail**. O Junkes Finance procura no Gmail os e-mails de `no-reply@inter.co` com o extrato (ao abrir, a cada 30 minutos e ao voltar para a janela), baixa o anexo OFX e importa sozinho, sem duplicar o que já existe.
+
+Para ativar: crie uma **senha de app** do Google (myaccount.google.com/apppasswords, exige verificação em duas etapas) e cole em **Importar extrato do Inter → Configurar**. A senha fica criptografada no computador (`email.bin`). O código fica em `app/email.js`.
+
 ## Conselhos da IA (Metas)
 
 A aba **Metas** calcula quanto guardar por mês e sugere limites por categoria sem precisar de internet.
@@ -34,6 +40,7 @@ O GitHub Actions percebe o número novo, monta o instalador num Windows e public
 | `src/base.css` | Cores, fontes e estilos base |
 | `assets/` | Logo e fonte Alice (funciona sem internet) |
 | `app/main.js` | Janela do Windows e atualização automática |
+| `app/email.js` | Leitura dos extratos do Inter no Gmail (IMAP) |
 | `app/ia.js` / `app/preload.js` | Conselhos da IA (Claude) e ponte segura com a página |
 | `app/icon.ico` | Ícone do app |
 | `build.js` | Gera `app/index.html` a partir de `src/` |
