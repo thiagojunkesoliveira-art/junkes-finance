@@ -166,6 +166,27 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
 .ia-chave input { flex: 1 1 220px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunken); color: var(--ink-strong); }
 .ia-chave a { color: var(--pos); }
 
+:root { --c9: #C79BB4; --c10: #A7B4BC; }
+.tx-open { background: none; border: 0; padding: 0; margin: 0; text-align: left; cursor: pointer; font: inherit; color: inherit; min-width: 0; border-radius: 6px; }
+.tx-open:hover b { text-decoration: underline; text-decoration-color: var(--teal); text-underline-offset: 3px; }
+.amt.mov { color: var(--muted); }
+.ajuste { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.ajuste .money { flex: 1 1 180px; }
+.ajuste input { width: 100%; padding: 9px 12px 9px 38px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunken); color: var(--ink-strong); }
+.ajuste .primary { padding: 9px 18px; }
+#s-origem { margin: 6px 0 0; }
+.lembrar { display: flex; gap: 8px; align-items: center; color: var(--ink); font-size: 0.92rem; cursor: pointer; }
+.lembrar input { width: 18px; height: 18px; flex: none; accent-color: var(--teal); }
+.tbl td small { display: block; }
+dialog#ed { border: 0; border-radius: 18px; padding: 0; width: min(520px, calc(100% - 32px)); box-shadow: 0 20px 60px rgb(0 0 0 / .25); color: var(--ink); background: var(--surface); }
+dialog#ed::backdrop { background: rgb(40 42 38 / .35); }
+#ed-form { display: grid; gap: 12px; padding: 22px; }
+#ed-form h2 { color: var(--teal); }
+.regras { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.regras li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--line); color: var(--ink-strong); }
+.regras li:last-child { border-bottom: 0; }
+.regras li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.regras li span:nth-child(2) { color: var(--muted); font-size: 0.9rem; }
 /* ===== Telas ===== */
 .view { display: grid; gap: 22px; }
 
@@ -286,13 +307,18 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
     </div>
     <div>
       <h1 class="page-title">Saldo atual</h1>
-      <p class="page-sub">Soma de tudo o que entrou menos tudo o que saiu.</p>
+      <p class="page-sub">Quanto você tem na conta hoje e o balanço do mês.</p>
     </div>
     <section class="summary" aria-label="Saldo">
       <div class="saldo">
         <div class="label">Disponível hoje</div>
         <div class="val" id="s-total"></div>
         <div class="sub">Saldo de <span id="s-mes-nome"></span>: <span class="num" id="s-saldo"></span></div>
+        <p class="hint" id="s-origem"></p>
+        <form class="ajuste" id="aj-form" hidden novalidate>
+          <div class="money"><span>R$</span><input id="aj-valor" inputmode="decimal" placeholder="Saldo no app do Inter" autocomplete="off" aria-label="Saldo atual no banco"></div>
+          <button class="primary" type="submit">Salvar</button><button class="ghost" type="button" id="aj-cancel">Cancelar</button>
+        </form>
       </div>
       <div class="kpi in"><div class="label">Entradas do mês</div><div class="val num" id="s-in"></div></div>
       <div class="kpi out"><div class="label">Saídas do mês</div><div class="val num" id="s-out"></div></div>
@@ -355,6 +381,11 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
         <div id="recent"></div>
       </section>
     </div>
+    <section class="panel" id="regras-box" hidden>
+      <div class="panel-head"><h2>Suas regras de categoria</h2><span class="label" id="regras-n"></span></div>
+      <p class="hint" style="margin:0">Criadas quando você corrige uma categoria. São usadas automaticamente nas próximas importações.</p>
+      <ul class="regras" id="regras"></ul>
+    </section>
   </section>
 
   <!-- GASTOS -->
@@ -436,6 +467,7 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
           <button class="chip" data-f="todos" aria-pressed="true">Todos</button>
           <button class="chip" data-f="entrada" aria-pressed="false">Entradas</button>
           <button class="chip" data-f="saida" aria-pressed="false">Saídas</button>
+          <button class="chip" data-f="mov" aria-pressed="false">Movimentações</button>
         </div>
       </div>
       <div id="r-list"></div>
@@ -567,10 +599,33 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
           <thead><tr><th></th><th>Data</th><th>Descrição</th><th>Categoria</th><th style="text-align:right">Valor</th></tr></thead>
           <tbody id="imp-body"></tbody>
         </table></div>
+        <label class="lembrar"><input type="checkbox" id="imp-lembrar" checked> Lembrar as categorias que eu mudar e usar nas próximas importações</label>
         <div class="imp-actions"><button class="primary" type="button" id="imp-ok"></button><button class="ghost" type="button" id="imp-cancel">Cancelar</button></div>
       </div>
     </section>
 </div>
+
+<dialog id="ed" aria-labelledby="ed-tit">
+  <form id="ed-form" novalidate>
+    <h2 id="ed-tit">Editar lançamento</h2>
+    <div class="seg" role="radiogroup" aria-label="Tipo">
+      <input type="radio" name="ed-tipo" id="ed-saida" value="saida"><label for="ed-saida">Saída</label>
+      <input type="radio" name="ed-tipo" id="ed-entrada" value="entrada"><label for="ed-entrada">Entrada</label>
+    </div>
+    <div class="field"><label for="ed-desc">Descrição</label><input id="ed-desc" autocomplete="off"></div>
+    <div class="row2">
+      <div class="field"><label for="ed-valor">Valor</label><div class="money"><span>R$</span><input id="ed-valor" inputmode="decimal" autocomplete="off"></div></div>
+      <div class="field"><label for="ed-data">Data</label><input type="date" id="ed-data"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="ed-cat">Categoria</label><select id="ed-cat"></select></div>
+      <div class="field"><label for="ed-forma">Pagamento</label><select id="ed-forma"><option>Pix</option><option>Débito</option><option>Crédito</option><option>Boleto</option><option>Dinheiro</option><option>Transferência</option></select></div>
+    </div>
+    <label class="lembrar"><input type="checkbox" id="ed-regra"> <span id="ed-regra-txt"></span></label>
+    <p class="err" id="ed-err" hidden></p>
+    <div class="imp-actions"><button class="primary" type="submit">Salvar</button><button class="ghost" type="button" id="ed-cancel">Cancelar</button><button class="link-btn" type="button" id="ed-del" style="margin-left:auto;color:var(--neg)">Excluir lançamento</button></div>
+  </form>
+</dialog>
 
 <div class="toast" id="toast" hidden><span id="toast-msg"></span><button id="undo">Desfazer</button></div>
 
@@ -578,11 +633,20 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
 const CATS = {
   saida: [
     ["Moradia", "--c1"], ["Alimentação", "--c2"], ["Transporte", "--c6"], ["Saúde", "--c5"],
-    ["Lazer", "--c3"], ["Assinaturas", "--c7"], ["Educação", "--c4"], ["Outros", "--c8"]
+    ["Lazer", "--c3"], ["Assinaturas", "--c7"], ["Educação", "--c4"], ["Cartão de crédito", "--c9"], ["Outros", "--c8"]
   ],
-  entrada: [["Salário", "--c2"], ["Freelance", "--c1"], ["Rendimentos", "--c3"], ["Outros", "--c8"]]
+  entrada: [["Salário", "--c2"], ["Freelance", "--c1"], ["Rendimentos", "--c3"], ["Outros", "--c8"]],
+  // Movimentações: mexem no saldo, mas não contam como gasto nem como renda
+  mov: [["Investimento", "--c10"], ["Entre minhas contas", "--c10"], ["Outra movimentação", "--c10"]]
 };
-const color = (tipo, cat) => { const c = CATS[tipo].find(x => x[0] === cat); return `var(${c ? c[1] : "--c8"})`; };
+const color = (tipo, cat, mov) => { const c = (mov ? CATS.mov : CATS[tipo]).find(x => x[0] === cat); return `var(${c ? c[1] : "--c8"})`; };
+/* <select> de categoria: valor "c:Nome" (gasto/renda) ou "m:Nome" (movimentação) */
+function opcoesCat(tipo, cat, mov) {
+  const op = (pre, nome) => `<option value="${pre}:${nome}"${(pre === "m") === !!mov && nome === cat ? " selected" : ""}>${nome}</option>`;
+  return `<optgroup label="${tipo === "entrada" ? "Entradas" : "Saídas"}">${CATS[tipo].map(c => op("c", c[0])).join("")}</optgroup>
+    <optgroup label="Não conta como gasto nem renda">${CATS.mov.map(c => op("m", c[0])).join("")}</optgroup>`;
+}
+const lerCat = v => ({ mov: v.startsWith("m:"), cat: v.slice(2) });
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const pad = n => String(n).padStart(2, "0");
 const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -590,6 +654,7 @@ const fromIso = s => { const [y, m, d] = s.split("-").map(Number); return new Da
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 const signed = v => `${v >= 0 ? "+" : "−"} ${brl.format(Math.abs(v))}`;
 const KEY = "junkes-finance-v1";
+const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const $ = id => document.getElementById(id);
 
 let txs;
@@ -597,7 +662,40 @@ try { txs = JSON.parse(localStorage.getItem(KEY)); } catch (e) { txs = null; }
 if (!Array.isArray(txs)) txs = [];
 // Remove os lançamentos de exemplo de versões anteriores
 if (txs.some(t => t.exemplo)) { txs = txs.filter(t => !t.exemplo); try { localStorage.setItem(KEY, JSON.stringify(txs)); } catch (e) {} }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(txs)); } catch (e) {} };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(txs)); localStorage.setItem(KEY + "-conta", JSON.stringify(conta)); localStorage.setItem(KEY + "-regras", JSON.stringify(regras)); } catch (e) {} };
+
+/* Saldo da conta: último saldo informado pelo banco (ou por você) + lançamentos depois dele */
+let conta = null, regras = [];
+try { conta = JSON.parse(localStorage.getItem(KEY + "-conta")); } catch (e) {}
+try { regras = JSON.parse(localStorage.getItem(KEY + "-regras")) || []; } catch (e) {}
+const sinal = t => t.tipo === "entrada" ? t.valor : -t.valor;
+function saldoAtual() {
+  const ate = iso(new Date());
+  if (!conta) return txs.filter(t => t.data <= ate).reduce((s, t) => s + sinal(t), 0);
+  return txs.filter(t => t.data <= ate && (t.data > conta.data || (t.data === conta.data && (t.criado || 0) > conta.criado)))
+    .reduce((s, t) => s + sinal(t), conta.valor);
+}
+
+/* Regras de categoria aprendidas com as suas correções */
+const chaveDe = d => norm(d).replace(/\d+/g, " ").replace(/[^a-z ]/g, " ").replace(/\s+/g, " ").trim();
+function regraPara(desc) {
+  const k = chaveDe(desc);
+  return regras.find(r => r.chave === k) || regras.filter(r => r.chave.length >= 5 && k.includes(r.chave)).sort((a, b) => b.chave.length - a.chave.length)[0] || null;
+}
+function salvarRegra(desc, cat, mov) {
+  const chave = chaveDe(desc); if (!chave) return;
+  regras = regras.filter(r => r.chave !== chave);
+  regras.push({ chave, nome: desc.slice(0, 60), cat, mov: !!mov });
+}
+const regraServe = (r, tipo) => r && (r.mov || CATS[tipo].some(c => c[0] === r.cat));
+
+/* Movimentações reconhecidas pelo texto do extrato */
+function movDe(texto) {
+  const s = norm(texto);
+  if (/aplicac|resgate|investiment|porquinho|cofrinho|tesouro direto|corretora|poupanca/.test(s)) return "Investimento";
+  if (/entre contas|mesma titularidade|conta propria/.test(s)) return "Entre minhas contas";
+  return null;
+}
 
 const hoje = new Date();
 const hojeIso = iso(hoje);
@@ -605,7 +703,7 @@ let gMes = { y: hoje.getFullYear(), m: hoje.getMonth() };
 var periodo = "mes"; let ref = new Date(hoje), filtro = "todos";
 let undoFn = null, toastTimer;
 
-const soma = (list, tipo) => list.filter(t => t.tipo === tipo).reduce((s, t) => s + t.valor, 0);
+const soma = (list, tipo) => list.filter(t => t.tipo === tipo && !t.mov).reduce((s, t) => s + t.valor, 0);
 const doMes = (y, m) => t => { const d = fromIso(t.data); return d.getFullYear() === y && d.getMonth() === m; };
 const nomeMes = (y, m, opt = { month: "long", year: "numeric" }) => cap(new Date(y, m, 1).toLocaleDateString("pt-BR", opt));
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
@@ -623,9 +721,9 @@ function lista(items, vazio) {
       <div class="day-head"><span class="label">${data === hojeIso ? "Hoje · " : ""}${nome}</span><span class="num">${signed(tot)}</span></div>
       ${itens.map(t => `
         <div class="tx">
-          <div class="ico" style="background:${color(t.tipo, t.cat)}" aria-hidden="true">${t.cat.slice(0, 2)}</div>
-          <div class="desc"><b>${esc(t.desc)}</b><small>${t.cat} · ${t.forma}</small>${t.exemplo ? '<span class="tag">exemplo</span>' : ""}</div>
-          <div class="amt ${t.tipo === "entrada" ? "in" : ""}">${t.tipo === "entrada" ? "+" : "−"} ${brl.format(t.valor)}</div>
+          <div class="ico" style="background:${color(t.tipo, t.cat, t.mov)}" aria-hidden="true">${t.cat.slice(0, 2)}</div>
+          <button type="button" class="desc tx-open" data-id="${t.id}" title="Editar lançamento"><b>${esc(t.desc)}</b><small>${t.cat} · ${t.forma}</small>${t.mov ? '<span class="tag">não conta como gasto</span>' : ""}</button>
+          <div class="amt ${t.mov ? "mov" : t.tipo === "entrada" ? "in" : ""}">${t.tipo === "entrada" ? "+" : "−"} ${brl.format(t.valor)}</div>
           <button class="del" data-id="${t.id}" aria-label="Excluir ${esc(t.desc)}">×</button>
         </div>`).join("")}
     </div>`;
@@ -658,7 +756,11 @@ function rotulo(ini, fim, periodo = window.periodo) {
 
 function render() {
   $("notice").hidden = txs.length > 0;
-  const total = txs.filter(t => t.data <= hojeIso).reduce((s, t) => s + (t.tipo === "entrada" ? t.valor : -t.valor), 0);
+  const total = saldoAtual();
+  const fmtD = s => s.split("-").reverse().join("/");
+  $("s-origem").innerHTML = conta
+    ? `${conta.origem === "extrato" ? "Saldo do extrato do Inter" : "Saldo que você informou"} em ${fmtD(conta.data)}, mais os lançamentos depois disso. <button type="button" class="link-btn" id="aj-abrir">Ajustar saldo</button>`
+    : txs.length ? `Calculado só com os lançamentos do app, então pode não bater com o banco. <button type="button" class="link-btn" id="aj-abrir">Informar o saldo do banco</button>` : "";
   const mesAtual = txs.filter(doMes(hoje.getFullYear(), hoje.getMonth()));
   const entM = soma(mesAtual, "entrada"), saiM = soma(mesAtual, "saida");
 
@@ -687,7 +789,7 @@ function render() {
 
   /* Gastos */
   $("g-label").textContent = nomeMes(gMes.y, gMes.m);
-  const saidas = txs.filter(t => t.tipo === "saida" && doMes(gMes.y, gMes.m)(t));
+  const saidas = txs.filter(t => t.tipo === "saida" && !t.mov && doMes(gMes.y, gMes.m)(t));
   const gTot = saidas.reduce((s, t) => s + t.valor, 0);
   const ant = new Date(gMes.y, gMes.m - 1, 1);
   const gAnt = soma(txs.filter(doMes(ant.getFullYear(), ant.getMonth())), "saida");
@@ -714,7 +816,7 @@ function render() {
   $("r-saldo").textContent = signed(rIn - rOut);
   $("r-saldo").style.color = rIn - rOut < 0 ? "var(--neg)" : "";
   const vazio = { dia: "Nenhum lançamento neste dia.", semana: "Nenhum lançamento nesta semana.", mes: "Nenhum lançamento neste mês." }[periodo];
-  $("r-list").innerHTML = lista(per.filter(t => filtro === "todos" || t.tipo === filtro), vazio);
+  $("r-list").innerHTML = lista(per.filter(t => filtro === "todos" || (filtro === "mov" ? t.mov : t.tipo === filtro && !t.mov)), vazio);
 }
 
 /* Gráfico de rosca por categoria */
@@ -729,7 +831,7 @@ function renderChart(id) {
   const [ini, fim] = intervalo(st.periodo, st.ref());
   const a = iso(ini), b = iso(fim);
   const por = {};
-  txs.filter(t => t.tipo === "saida" && t.data >= a && t.data <= b).forEach(t => por[t.cat] = (por[t.cat] || 0) + t.valor);
+  txs.filter(t => t.tipo === "saida" && !t.mov && t.data >= a && t.data <= b).forEach(t => por[t.cat] = (por[t.cat] || 0) + t.valor);
   const itens = Object.entries(por).sort((x, y) => y[1] - x[1]);
   const total = itens.reduce((s, x) => s + x[1], 0);
   if (st.sel && !por[st.sel]) st.sel = null;
@@ -779,7 +881,6 @@ Object.keys(charts).forEach(id => {
 });
 
 /* ===== Importar extrato (OFX / CSV do Inter) ===== */
-const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const REGRAS = [
   ["Alimentação", ["ifood", "restaurante", "mercado", "supermerc", "padaria", "lanchonete", "burger", "pizza", "rappi", "atacad", "assai", "carrefour", "hortifruti", "acougue", "cafe", "lanches", "mcdonald", "bk "]],
   ["Transporte", ["uber", "99app", "99 pop", "99*", "posto", "combust", "shell", "ipiranga", "petrobras", "estacionamento", "sem parar", "veloe", "pedagio", "metro", "onibus", "buser"]],
@@ -793,9 +894,10 @@ function categoria(tipo, texto) {
   const s = " " + norm(texto) + " ";
   if (tipo === "entrada") {
     if (/salario|folha|proventos|pagamento de salario/.test(s)) return "Salário";
-    if (/rendimento|cdb|juros|resgate|dividendo|lci|lca|tesouro/.test(s)) return "Rendimentos";
+    if (/rendimento|juros|dividendo/.test(s)) return "Rendimentos";
     return "Outros";
   }
+  if (/fatura|cartao de credito/.test(s)) return "Cartão de crédito";
   for (const [cat, chaves] of REGRAS) if (chaves.some(k => s.includes(k))) return cat;
   return "Outros";
 }
@@ -817,6 +919,7 @@ async function lerTexto(file) {
 }
 function lerOFX(txt) {
   const out = [];
+  const bal = txt.match(/<LEDGERBAL>[^]*?<BALAMT>([^<\r\n]*)(?:[^]*?<DTASOF>(\d{8}))?/i);
   const blocos = txt.match(/<STMTTRN>[\s\S]*?(<\/STMTTRN>|(?=<STMTTRN>)|(?=<\/BANKTRANLIST>))/gi) || [];
   const tag = (b, n) => { const m = b.match(new RegExp("<" + n + ">([^<\\r\\n]*)", "i")); return m ? m[1].trim() : ""; };
   blocos.forEach(b => {
@@ -826,7 +929,13 @@ function lerOFX(txt) {
     const desc = [nome, memo].filter(Boolean).filter((x, i, a) => a.indexOf(x) === i).join(" · ") || "Lançamento";
     out.push({ data: `${dt.slice(0, 4)}-${dt.slice(4, 6)}-${dt.slice(6, 8)}`, valor: v, desc, base: desc, fitid: tag(b, "FITID") });
   });
-  return out;
+  let saldo = null;
+  if (bal && isFinite(parseFloat(bal[1].replace(",", ".")))) {
+    const maxData = out.map(o => o.data).sort().pop();
+    const dt = bal[2] ? `${bal[2].slice(0, 4)}-${bal[2].slice(4, 6)}-${bal[2].slice(6, 8)}` : maxData;
+    saldo = { valor: parseFloat(bal[1].replace(",", ".")), data: maxData && dt > maxData ? maxData : dt };
+  }
+  return { itens: out, saldo };
 }
 function splitCSV(linha, sep) {
   const cols = []; let cur = "", q = false;
@@ -848,14 +957,15 @@ function dataBR(s) {
 function lerCSV(txt) {
   const linhas = txt.split(/\r?\n/);
   const hi = linhas.findIndex(l => { const n = norm(l); return n.includes("data") && n.includes("valor"); });
-  if (hi < 0) return [];
+  if (hi < 0) return { itens: [], saldo: null };
   const sep = linhas[hi].includes(";") ? ";" : ",";
   const head = splitCSV(linhas[hi], sep).map(norm);
   const iData = head.findIndex(h => h.startsWith("data"));
   const iValor = head.findIndex(h => h.includes("valor") && !h.includes("saldo"));
   const iHist = head.findIndex(h => h.includes("hist"));
   const iDesc = head.findIndex(h => h.includes("descri"));
-  const out = [];
+  const iSaldo = head.findIndex(h => h.startsWith("saldo"));
+  const out = [], saldos = [];
   for (const l of linhas.slice(hi + 1)) {
     if (!l.trim()) continue;
     const c = splitCSV(l, sep);
@@ -863,18 +973,36 @@ function lerCSV(txt) {
     if (!data || !isFinite(v) || v === 0) continue;
     const hist = iHist >= 0 ? c[iHist] : "", d = iDesc >= 0 ? c[iDesc] : "";
     out.push({ data, valor: v, desc: d || hist || "Lançamento", base: `${hist} ${d}` });
+    if (iSaldo >= 0 && (c[iSaldo] || "").trim()) { const sv = parseValor(c[iSaldo]); if (isFinite(sv)) saldos.push({ data, valor: sv }); }
   }
-  return out;
+  // Saldo mais recente: o do último dia, respeitando a ordem do arquivo
+  let saldo = null;
+  if (saldos.length) {
+    const decresc = saldos[0].data >= saldos[saldos.length - 1].data;
+    const max = saldos.reduce((m, s) => s.data > m ? s.data : m, "");
+    const doDia = saldos.filter(s => s.data === max);
+    saldo = decresc ? doDia[0] : doDia[doDia.length - 1];
+  } else {
+    const l = linhas.slice(0, hi).find(x => /^\s*saldo\s*[;:,]/i.test(x));
+    const v = l ? parseValor(l.split(/[;:]/)[1] || "") : NaN;
+    if (isFinite(v) && out.length) saldo = { valor: v, data: out.map(o => o.data).sort().pop() };
+  }
+  return { itens: out, saldo };
 }
 
-let pend = [], pendExemplo = false;
+let pend = [], pendExemplo = false, pendSaldo = null;
 const chaveTx = t => `${t.data}|${t.tipo}|${t.valor.toFixed(2)}|${norm(t.desc)}`;
-function prepararImport(brutos, exemplo) {
+function prepararImport(lido, exemplo) {
   pendExemplo = exemplo;
+  const brutos = lido.itens;
+  pendSaldo = lido.saldo && (!conta || lido.saldo.data >= conta.data) ? lido.saldo : null;
   const existentes = new Set(txs.map(chaveTx)), fits = new Set(txs.map(t => t.fitid).filter(Boolean));
   pend = brutos.map(r => {
     const tipo = r.valor > 0 ? "entrada" : "saida";
-    const t = { tipo, valor: Math.round(Math.abs(r.valor) * 100) / 100, desc: r.desc, data: r.data, cat: categoria(tipo, r.base), forma: formaDe(r.base), fitid: r.fitid || "" };
+    const t = { tipo, valor: Math.round(Math.abs(r.valor) * 100) / 100, desc: r.desc, data: r.data, cat: categoria(tipo, r.base), mov: false, forma: formaDe(r.base), fitid: r.fitid || "" };
+    const rg = regraPara(r.desc), mv = movDe(r.base);
+    if (regraServe(rg, tipo)) { t.cat = rg.cat; t.mov = rg.mov; t.regra = true; }
+    else if (mv) { t.cat = mv; t.mov = true; }
     t.dup = (t.fitid && fits.has(t.fitid)) || existentes.has(chaveTx(t));
     t.on = !t.dup;
     return t;
@@ -887,13 +1015,14 @@ function renderImport() {
   const datas = pend.map(t => t.data).sort();
   const fmt = s => s.split("-").reverse().join("/");
   const dups = pend.filter(t => t.dup).length, n = pend.filter(t => t.on).length;
-  $("imp-sum").innerHTML = `${pend.length} lançamentos encontrados <span>de ${fmt(datas[0])} a ${fmt(datas[datas.length - 1])}${dups ? ` · ${dups} já estavam no site e ficaram desmarcados` : ""}</span>`;
+  $("imp-sum").innerHTML = `${pend.length} lançamentos encontrados <span>de ${fmt(datas[0])} a ${fmt(datas[datas.length - 1])}${dups ? ` · ${dups} já estavam no app e ficaram desmarcados` : ""}</span>`
+    + (pendSaldo ? `<br><span>Saldo da conta no extrato: <b style="font-weight:400;color:var(--ink-strong)">${brl.format(pendSaldo.valor)}</b> em ${fmt(pendSaldo.data)}. Ele passa a ser o seu saldo atual.</span>` : "");
   $("imp-body").innerHTML = pend.map((t, i) => `
     <tr class="${t.on ? "" : "off"}">
       <td><input type="checkbox" id="imp-c-${i}" data-i="${i}" ${t.on ? "checked" : ""} aria-label="Importar ${esc(t.desc)}"></td>
       <td>${fmt(t.data).slice(0, 5)}</td>
       <td>${esc(t.desc)}${t.dup ? '<span class="dup">já existe</span>' : ""}<small>${t.forma}</small></td>
-      <td><select id="imp-s-${i}" data-i="${i}" aria-label="Categoria">${CATS[t.tipo].map(c => `<option${c[0] === t.cat ? " selected" : ""}>${c[0]}</option>`).join("")}</select></td>
+      <td><select id="imp-s-${i}" data-i="${i}" aria-label="Categoria">${opcoesCat(t.tipo, t.cat, t.mov)}</select>${t.regra ? '<small>pela sua regra</small>' : t.mov ? '<small>não conta como gasto</small>' : ""}</td>
       <td class="v ${t.tipo === "entrada" ? "in" : ""}">${t.tipo === "entrada" ? "+" : "−"} ${brl.format(t.valor)}</td>
     </tr>`).join("");
   $("imp-ok").textContent = n ? `Importar ${n} lançamento${n > 1 ? "s" : ""}` : "Nada marcado";
@@ -905,7 +1034,7 @@ async function receberArquivo(file) {
   if (/\.pdf$/i.test(file.name)) { mostrarErroImp("Arquivos PDF não podem ser lidos. Exporte o extrato do Inter em OFX ou CSV e tente de novo."); return; }
   const txt = await lerTexto(file);
   const brutos = /<OFX>|OFXHEADER/i.test(txt) ? lerOFX(txt) : lerCSV(txt);
-  if (!brutos.length) { mostrarErroImp(`Não encontrei lançamentos em "${file.name}". Confira se é o extrato exportado em OFX ou CSV.`); return; }
+  if (!brutos.itens.length) { mostrarErroImp(`Não encontrei lançamentos em "${file.name}". Confira se é o extrato exportado em OFX ou CSV.`); return; }
   prepararImport(brutos, false);
 }
 function mostrarErroImp(msg) { $("imp-err").textContent = msg; $("imp-err").hidden = false; pend = []; renderImport(); }
@@ -917,7 +1046,8 @@ const drop = $("drop");
 drop.addEventListener("drop", e => receberArquivo(e.dataTransfer.files[0]));
 $("imp-body").addEventListener("change", e => {
   const i = +e.target.dataset.i; if (!pend[i]) return;
-  if (e.target.type === "checkbox") pend[i].on = e.target.checked; else pend[i].cat = e.target.value;
+  if (e.target.type === "checkbox") pend[i].on = e.target.checked;
+  else { Object.assign(pend[i], lerCat(e.target.value)); pend[i].mudou = true; pend[i].regra = false; }
   renderImport();
 });
 $("imp-all").addEventListener("click", () => { pend.forEach(t => t.on = true); renderImport(); });
@@ -925,11 +1055,14 @@ $("imp-none").addEventListener("click", () => { pend.forEach(t => t.on = false);
 $("imp-cancel").addEventListener("click", () => { pend = []; renderImport(); });
 $("imp-ok").addEventListener("click", () => {
   const sel = pend.filter(t => t.on), stamp = Date.now();
-  const novos = sel.map((t, i) => ({ id: `i${stamp}-${i}`, tipo: t.tipo, valor: t.valor, desc: t.desc, cat: t.cat, forma: t.forma, data: t.data, fitid: t.fitid || undefined, origem: "Inter" }));
+  const antes = { conta, regras: [...regras] };
+  const novos = sel.map((t, i) => ({ id: `i${stamp}-${i}`, tipo: t.tipo, valor: t.valor, desc: t.desc, cat: t.cat, mov: t.mov || undefined, forma: t.forma, data: t.data, fitid: t.fitid || undefined, origem: "Inter", criado: stamp }));
+  if ($("imp-lembrar").checked) pend.filter(t => t.mudou).forEach(t => salvarRegra(t.desc, t.cat, t.mov));
+  if (pendSaldo) conta = { valor: pendSaldo.valor, data: pendSaldo.data, criado: stamp + 1, origem: "extrato" };
   txs.push(...novos);
-  pend = []; save(); render(); renderImport();
+  pend = []; pendSaldo = null; save(); render(); renderImport(); renderRegras();
   const ids = new Set(novos.map(t => t.id));
-  toast(`${novos.length} lançamento${novos.length > 1 ? "s" : ""} importado${novos.length > 1 ? "s" : ""} do Inter.`, () => { txs = txs.filter(t => !ids.has(t.id)); });
+  toast(`${novos.length} lançamento${novos.length > 1 ? "s" : ""} importado${novos.length > 1 ? "s" : ""} do Inter.`, () => { txs = txs.filter(t => !ids.has(t.id)); conta = antes.conta; regras = antes.regras; renderRegras(); });
 });
 /* ===== Projeção ===== */
 const brlC = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 });
@@ -1095,7 +1228,7 @@ const saveMetas = () => { try { localStorage.setItem(MT_KEY, JSON.stringify(meta
 const metaAtiva = () => metas.find(m => m.id === metaSel) || metas[0] || null;
 
 /* Quanto o corte de cada categoria pode chegar, em % do gasto médio */
-const FLEX = { "Lazer": 0.5, "Assinaturas": 0.5, "Outros": 0.3, "Alimentação": 0.25, "Transporte": 0.2, "Educação": 0.1, "Saúde": 0.05, "Moradia": 0 };
+const FLEX = { "Cartão de crédito": 0.15, "Lazer": 0.5, "Assinaturas": 0.5, "Outros": 0.3, "Alimentação": 0.25, "Transporte": 0.2, "Educação": 0.1, "Saúde": 0.05, "Moradia": 0 };
 
 function historico() {
   // Usa os últimos 3 meses fechados com lançamentos; sem eles, o mês atual.
@@ -1112,9 +1245,9 @@ function historico() {
   const todos = meses.flat();
   const renda = soma(todos, "entrada") / n, gasto = soma(todos, "saida") / n;
   const porCat = {};
-  todos.filter(t => t.tipo === "saida").forEach(t => porCat[t.cat] = (porCat[t.cat] || 0) + t.valor / n);
+  todos.filter(t => t.tipo === "saida" && !t.mov).forEach(t => porCat[t.cat] = (porCat[t.cat] || 0) + t.valor / n);
   const porLocal = {};
-  todos.filter(t => t.tipo === "saida").forEach(t => {
+  todos.filter(t => t.tipo === "saida" && !t.mov).forEach(t => {
     const k = t.desc.trim().toLowerCase().slice(0, 40);
     const o = porLocal[k] = porLocal[k] || { descricao: t.desc.slice(0, 40), categoria: t.cat, totalPorMes: 0, vezesPorMes: 0 };
     o.totalPorMes += t.valor / n; o.vezesPorMes += 1 / n;
@@ -1152,7 +1285,7 @@ function planoMeta(meta) {
 const nomePrazo = prazo => { const [y, m] = prazo.split("-").map(Number); return new Date(y, m - 1, 1).toLocaleDateString("pt-BR", { month: "short", year: "numeric" }).replace(".", ""); };
 
 function limitesHTML(p, titulo) {
-  const mesAtual = txs.filter(t => t.tipo === "saida" && doMes(hoje.getFullYear(), hoje.getMonth())(t));
+  const mesAtual = txs.filter(t => t.tipo === "saida" && !t.mov && doMes(hoje.getFullYear(), hoje.getMonth())(t));
   const gastoCat = {};
   mesAtual.forEach(t => gastoCat[t.cat] = (gastoCat[t.cat] || 0) + t.valor);
   const diasMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
@@ -1235,7 +1368,7 @@ function md(texto) {
 }
 function resumoIA(m) {
   const p = planoMeta(m), h = p.h;
-  const mesAtual = txs.filter(t => t.tipo === "saida" && doMes(hoje.getFullYear(), hoje.getMonth())(t));
+  const mesAtual = txs.filter(t => t.tipo === "saida" && !t.mov && doMes(hoje.getFullYear(), hoje.getMonth())(t));
   const gastoMes = {};
   mesAtual.forEach(t => gastoMes[t.cat] = (gastoMes[t.cat] || 0) + t.valor);
   const r2 = v => Math.round(v * 100) / 100;
@@ -1361,6 +1494,86 @@ function renderMetasResumo() {
   if (html) box.innerHTML = html + `<a class="link-btn" href="#metas">Ver o plano completo</a>`;
 }
 
+/* ===== Edição de lançamentos ===== */
+let edId = null;
+const edTipo = () => document.querySelector('input[name="ed-tipo"]:checked').value;
+function parecidos(t) { const k = chaveDe(t.desc); return txs.filter(x => x.id !== t.id && chaveDe(x.desc) === k && x.tipo === t.tipo); }
+function abrirEdicao(id) {
+  const t = txs.find(x => x.id === id); if (!t) return;
+  edId = id;
+  $(t.tipo === "entrada" ? "ed-entrada" : "ed-saida").checked = true;
+  $("ed-desc").value = t.desc; $("ed-valor").value = numBR(t.valor); $("ed-data").value = t.data; $("ed-forma").value = t.forma;
+  $("ed-cat").innerHTML = opcoesCat(t.tipo, t.cat, t.mov);
+  $("ed-regra").checked = false; $("ed-err").hidden = true;
+  const n = parecidos(t).length;
+  $("ed-regra-txt").textContent = `Sempre usar esta categoria para "${t.desc.slice(0, 40)}"` + (n ? ` (e aplicar aos ${n} lançamento${n > 1 ? "s" : ""} parecido${n > 1 ? "s" : ""})` : "");
+  $("ed").showModal();
+}
+document.querySelectorAll('input[name="ed-tipo"]').forEach(r => r.addEventListener("change", () => {
+  const atual = lerCat($("ed-cat").value);
+  $("ed-cat").innerHTML = opcoesCat(edTipo(), atual.mov ? atual.cat : "Outros", atual.mov);
+}));
+$("ed-cancel").addEventListener("click", () => $("ed").close());
+$("ed-del").addEventListener("click", () => {
+  const i = txs.findIndex(t => t.id === edId); if (i < 0) return;
+  const removido = txs.splice(i, 1)[0];
+  $("ed").close(); save(); render();
+  toast(`"${removido.desc}" excluído.`, () => txs.push(removido));
+});
+$("ed-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const t = txs.find(x => x.id === edId); if (!t) return;
+  const valor = parseValor($("ed-valor").value), desc = $("ed-desc").value.trim(), data = $("ed-data").value;
+  const err = !(valor > 0) ? "Informe um valor maior que zero." : !desc ? "A descrição não pode ficar vazia." : !data ? "Escolha a data." : "";
+  $("ed-err").textContent = err; $("ed-err").hidden = !err;
+  if (err) return;
+  const antes = { txs: JSON.parse(JSON.stringify(txs)), regras: [...regras] };
+  const c = lerCat($("ed-cat").value), tipo = edTipo();
+  const iguais = $("ed-regra").checked ? parecidos(t) : [];
+  Object.assign(t, { tipo, valor: Math.round(valor * 100) / 100, desc, data, forma: $("ed-forma").value, cat: c.cat, mov: c.mov || undefined });
+  if ($("ed-regra").checked) {
+    salvarRegra(desc, c.cat, c.mov);
+    iguais.forEach(x => { if (c.mov || CATS[x.tipo].some(k => k[0] === c.cat)) { x.cat = c.cat; x.mov = c.mov || undefined; } });
+  }
+  $("ed").close(); save(); render(); renderRegras();
+  toast(iguais.length ? `Lançamento salvo e regra aplicada a mais ${iguais.length}.` : "Lançamento salvo.", () => { txs = antes.txs; regras = antes.regras; renderRegras(); });
+});
+document.addEventListener("click", e => { const b = e.target.closest(".tx-open"); if (b) abrirEdicao(b.dataset.id); });
+
+function renderRegras() {
+  $("regras-box").hidden = !regras.length;
+  $("regras-n").textContent = regras.length ? `${regras.length} regra${regras.length > 1 ? "s" : ""}` : "";
+  $("regras").innerHTML = regras.map((r, i) => `<li><span>${esc(r.nome)}</span><span>${r.cat}${r.mov ? " · não conta como gasto" : ""}</span><button class="del" type="button" data-regra="${i}" aria-label="Apagar regra de ${esc(r.nome)}">×</button></li>`).join("");
+}
+$("regras").addEventListener("click", e => {
+  const b = e.target.closest("[data-regra]"); if (!b) return;
+  const r = regras.splice(+b.dataset.regra, 1)[0]; save(); renderRegras();
+  toast(`Regra de "${r.nome}" apagada.`, () => { regras.push(r); renderRegras(); });
+});
+
+/* ===== Ajustar saldo ===== */
+document.addEventListener("click", e => {
+  if (e.target.id === "aj-abrir") { $("aj-form").hidden = false; $("aj-valor").value = numBR(saldoAtual()); $("aj-valor").select(); }
+});
+$("aj-cancel").addEventListener("click", () => $("aj-form").hidden = true);
+$("aj-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const v = parseValor($("aj-valor").value.replace(/^\s*-\s*/, "-"));
+  if (!isFinite(v)) { $("aj-valor").focus(); return; }
+  const antes = conta;
+  conta = { valor: Math.round(v * 100) / 100, data: iso(new Date()), criado: Date.now(), origem: "manual" };
+  $("aj-form").hidden = true; save(); render();
+  toast(`Saldo ajustado para ${brl.format(v)}.`, () => { conta = antes; });
+});
+
+/* Versões anteriores: marca aplicações e resgates já importados como movimentação */
+try {
+  if (!localStorage.getItem(KEY + "-mig-1.2")) {
+    txs.forEach(t => { const m = movDe(t.desc); if (m && !t.mov) { t.mov = true; t.cat = m; } });
+    localStorage.setItem(KEY + "-mig-1.2", "1"); save();
+  }
+} catch (e) {}
+
 /* Navegação entre telas */
 const VIEWS = ["inicio", "saldo", "gastos", "resumo", "projecao", "metas"];
 function rota() {
@@ -1413,7 +1626,7 @@ $("form").addEventListener("submit", e => {
   $("f-err").textContent = err; $("f-err").hidden = !err;
   if (err) return;
   const tipo = document.querySelector('input[name="tipo"]:checked').value;
-  const novo = { id: "t" + Date.now(), tipo, valor: Math.round(valor * 100) / 100, desc, cat: $("f-cat").value, forma: $("f-forma").value, data };
+  const novo = { id: "t" + Date.now(), criado: Date.now(), tipo, valor: Math.round(valor * 100) / 100, desc, cat: $("f-cat").value, forma: $("f-forma").value, data };
   txs.push(novo);
   save(); render();
   toast(`${tipo === "entrada" ? "Entrada" : "Saída"} de ${brl.format(novo.valor)} adicionada.`, () => { txs = txs.filter(t => t.id !== novo.id); });
@@ -1455,6 +1668,7 @@ document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () =
 }));
 
 render();
+renderRegras();
 renderProj();
 rota();
 </script>
