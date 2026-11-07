@@ -1,6 +1,7 @@
-const { app, BrowserWindow, Menu, shell, dialog } = require("electron");
+const { app, BrowserWindow, Menu, shell, dialog, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const path = require("path");
+const ia = require("./ia");
 
 if (!app.requestSingleInstanceLock()) app.quit();
 app.setAppUserModelId("com.junkes.finance");
@@ -14,7 +15,7 @@ function criarJanela() {
     icon: path.join(__dirname, "icon.png"),
     autoHideMenuBar: true,
     show: false,
-    webPreferences: { contextIsolation: true, sandbox: true }
+    webPreferences: { contextIsolation: true, sandbox: true, preload: path.join(__dirname, "preload.js") }
   });
   Menu.setApplicationMenu(null);
   win.loadFile(path.join(__dirname, "index.html"), { query: { v: app.getVersion() } });
@@ -46,5 +47,10 @@ function configurarAtualizacao() {
 }
 
 app.on("second-instance", () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); } });
+ipcMain.handle("ia:status", () => ia.status());
+ipcMain.handle("ia:salvar-chave", (_e, chave) => ia.salvarChave(chave));
+ipcMain.handle("ia:remover-chave", () => ia.removerChave());
+ipcMain.handle("ia:aconselhar", (_e, resumo) => ia.aconselhar(resumo));
+
 app.whenReady().then(() => { criarJanela(); configurarAtualizacao(); });
 app.on("window-all-closed", () => app.quit());

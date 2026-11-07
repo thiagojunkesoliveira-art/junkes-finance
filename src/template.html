@@ -34,9 +34,15 @@
 .imp-help { margin: 0; color: var(--ink); max-width: 70ch; }
 .imp-help b { font-weight: 400; color: var(--ink-strong); background: #FBF9E6; padding: 0 5px; border-radius: 4px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.drop { display: grid; justify-items: center; gap: 6px; text-align: center; border: 2px dashed var(--teal); border-radius: 14px; padding: 22px 16px; cursor: pointer; background: var(--accent-soft); color: var(--ink-strong); transition: background .2s ease; }
+.drop { display: flex; align-items: center; gap: 14px; text-align: left; border: 2px dashed var(--teal); border-radius: 14px; padding: 12px 16px; cursor: pointer; background: var(--accent-soft); color: var(--ink-strong); transition: background .2s ease; }
 .drop:hover, .drop.over { background: #D2EBE8; }
-.drop small { color: var(--muted); }
+.drop small { display: block; color: var(--muted); font-size: 0.88rem; }
+.drop b { font-weight: 400; font-size: 1.05rem; }
+.drop-ico { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, var(--teal), var(--sky)); }
+.drop-ico svg { width: 22px; height: 22px; fill: none; stroke: var(--ink-strong); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.imp-panel { padding: 14px 16px; gap: 10px; }
+.imp-how summary { cursor: pointer; color: var(--pos); font-size: 0.9rem; width: fit-content; }
+.imp-how p { margin-top: 8px; }
 #imp-file:focus-visible + .drop { outline: 2px solid var(--teal); outline-offset: 3px; }
 .imp-row { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; }
 .imp-sum { margin: 0; color: var(--ink-strong); }
@@ -106,6 +112,60 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
 @media (max-width: 860px) { .proj { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .split { grid-template-columns: 1fr 1fr; } .split .k-tot { grid-column: 1 / -1; } .pchart svg { height: 230px; } }
 
+/* ===== Metas ===== */
+.metas { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 860px) { .metas { grid-template-columns: minmax(0, 1fr); } }
+.mt-card { width: 100%; display: grid; gap: 6px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; cursor: pointer; color: var(--ink-strong); }
+.mt-card + .mt-card { margin-top: 10px; }
+.mt-card:hover { border-color: var(--teal); }
+.mt-card[aria-pressed="true"] { border-color: var(--teal); background: var(--accent-soft); }
+.mt-card .row { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.mt-card .row span:last-child { color: var(--muted); font-size: 0.88rem; white-space: nowrap; }
+.mt-card small { color: var(--muted); }
+.prog { height: 8px; border-radius: 999px; background: var(--sunken); overflow: hidden; }
+.prog i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--yellow), var(--teal)); }
+.pill { display: inline-block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.07em; padding: 2px 10px; border-radius: 999px; }
+.pill.ok { background: #E1F2EF; color: var(--pos); } .pill.ajuste { background: #FBF6D9; color: #8F8640; } .pill.dificil { background: var(--neg-soft); color: var(--neg); } .pill.neutro { background: var(--sunken); color: var(--muted); }
+.mt-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.mt-head h2 { font-size: 1.7rem; color: var(--ink-strong); }
+.mt-nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.mt-nums .val { font-size: 1.3rem; color: var(--ink-strong); font-variant-numeric: tabular-nums lining-nums; }
+@media (max-width: 560px) { .mt-nums { grid-template-columns: 1fr 1fr; } }
+.mt-msg { margin: 0; color: var(--ink); }
+.mt-msg b { font-weight: 400; color: var(--ink-strong); }
+.mt-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.mt-tools .field { flex: 1 1 160px; }
+.acoes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.acoes li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--line); color: var(--ink-strong); }
+.acoes li:last-child { border-bottom: 0; }
+.acoes .dot { width: 12px; height: 12px; border-radius: 4px; }
+.acoes small { display: block; color: var(--muted); font-size: 0.85rem; }
+.acoes .eco { color: var(--pos); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.lim { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.lim li { display: grid; gap: 5px; }
+.lim .line { display: flex; justify-content: space-between; gap: 10px; color: var(--ink-strong); font-size: 0.95rem; }
+.lim .line span:last-child { color: var(--muted); font-size: 0.88rem; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.lim .bar { height: 8px; border-radius: 999px; background: var(--sunken); overflow: hidden; }
+.lim .bar i { display: block; height: 100%; border-radius: 999px; background: var(--teal); }
+.lim .bar i.alerta { background: var(--yellow); } .lim .bar i.estourou { background: var(--neg); }
+.lim .line .estourou { color: var(--neg); }
+.ia-box { display: grid; gap: 12px; }
+.ia-txt { color: var(--ink-strong); line-height: 1.6; max-width: 75ch; }
+.ia-txt h3 { font-family: var(--f); font-weight: 400; font-size: 1.2rem; color: var(--teal); margin: 14px 0 4px; }
+.ia-txt h3:first-child { margin-top: 0; }
+.ia-txt ul { margin: 4px 0; padding-left: 20px; }
+.ia-txt li { margin: 4px 0; }
+.ia-txt p { margin: 6px 0; }
+.ia-txt b { font-weight: 700; }
+.ia-meta { font-size: 0.82rem; color: var(--muted); margin: 0; }
+.carregando { display: flex; align-items: center; gap: 10px; color: var(--muted); }
+.carregando::before { content: ""; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--teal); animation: gira 0.8s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+.ia-chave { display: grid; gap: 8px; }
+.ia-chave .row { display: flex; flex-wrap: wrap; gap: 8px; }
+.ia-chave input { flex: 1 1 220px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunken); color: var(--ink-strong); }
+.ia-chave a { color: var(--pos); }
+
 /* ===== Telas ===== */
 .view { display: grid; gap: 22px; }
 
@@ -115,7 +175,7 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
 .cover h1 { font-size: clamp(2.4rem, 7vw, 3.8rem); line-height: 1.05; }
 .cover h1 .y { color: var(--yellow); } .cover h1 .t { color: var(--teal); }
 .cover .tagline { margin: 6px 0 0; font-size: clamp(1.05rem, 2.4vw, 1.3rem); color: var(--ink); }
-.options { width: 100%; max-width: 1040px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; text-align: left; }
+.options { width: 100%; max-width: 1040px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 18px; text-align: left; }
 .opt { display: grid; gap: 10px; align-content: start; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; text-decoration: none; color: var(--ink); box-shadow: 0 4px 18px rgb(106 107 100 / .08); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .opt:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgb(106 107 100 / .16); border-color: var(--teal); }
 .opt .glyph { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; }
@@ -124,6 +184,9 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
 .opt:nth-child(2) .glyph { background: linear-gradient(135deg, #E6C485, var(--yellow)); }
 .opt:nth-child(3) .glyph { background: linear-gradient(135deg, var(--teal), var(--sky)); }
 .opt:nth-child(4) .glyph { background: linear-gradient(135deg, var(--yellow), var(--teal)); }
+.opt:nth-child(5) .glyph { background: linear-gradient(135deg, var(--sky), var(--yellow-2)); }
+.options .opt { grid-column: span 2; }
+.options .opt:nth-child(n+4) { grid-column: span 3; }
 .opt h2 { font-size: 1.5rem; color: var(--ink-strong); }
 .opt .preview { font-size: 1.35rem; color: var(--ink-strong); font-variant-numeric: tabular-nums lining-nums; }
 .opt .preview.neg { color: var(--neg); }
@@ -152,7 +215,7 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
 .period .month span { min-width: 210px; }
 .today { border: 0; background: none; color: var(--pos); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
-@media (max-width: 1080px) { .options { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 700px; } }
+@media (max-width: 1080px) { .options { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 700px; } .options .opt, .options .opt:nth-child(n+4) { grid-column: auto; } .options .opt:nth-child(5) { grid-column: 1 / -1; } }
 @media (max-width: 760px) {
   .options { grid-template-columns: minmax(0, 1fr); }
   .opt { grid-template-columns: 48px minmax(0, 1fr); column-gap: 14px; row-gap: 4px; }
@@ -203,10 +266,16 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
         <span class="preview" id="p-proj"></span>
         <p>Quanto você pode juntar guardando uma parte do que ganha.</p>
       </a>
+      <a class="opt" href="#metas">
+        <span class="glyph"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></span>
+        <h2>Metas</h2>
+        <span class="preview" id="p-metas"></span>
+        <p>Defina um objetivo e receba um plano de gastos, com conselhos da IA.</p>
+      </a>
     </nav>
     <div class="notice" id="notice" hidden style="max-width:1040px;width:100%;text-align:left">
-      <span>Você está vendo <b>dados de exemplo</b>. Adicione seus lançamentos ou apague os exemplos.</span>
-      <button class="link-btn" id="clear-ex">Apagar exemplos</button>
+      <span>Bem-vindo! Comece <b>importando o extrato do Inter</b> ou adicionando um lançamento em Saldo atual.</span>
+      <a class="link-btn" href="#saldo">Começar</a>
     </div>
   </section>
 
@@ -246,25 +315,6 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
         <ul class="legend"></ul>
       </div>
       <p class="ch-foot"></p>
-    </section>
-    <section class="panel" id="imp">
-      <div class="panel-head"><h2>Importar extrato do Inter</h2><button class="link-btn" id="imp-demo" type="button">Testar com um extrato de exemplo</button></div>
-      <p class="imp-help">No app ou no Internet Banking do Inter, abra o <b>Extrato</b>, escolha o período e use a opção de exportar. Baixe em <b>OFX</b> ou <b>CSV</b> (PDF não serve) e solte o arquivo aqui.</p>
-      <input type="file" id="imp-file" class="sr-only" accept=".ofx,.csv,.txt">
-      <label class="drop" id="drop" for="imp-file">
-        <span>Arraste o arquivo do extrato para cá ou <u>clique para escolher</u></span>
-        <small>Formatos aceitos: .ofx e .csv</small>
-      </label>
-      <p class="err" id="imp-err" hidden></p>
-      <div id="imp-prev" hidden style="display:grid;gap:12px">
-        <div class="imp-row"><p class="imp-sum" id="imp-sum"></p>
-          <div class="filters"><button class="chip" type="button" id="imp-all">Marcar todos</button><button class="chip" type="button" id="imp-none">Desmarcar todos</button></div></div>
-        <div class="tbl"><table>
-          <thead><tr><th></th><th>Data</th><th>Descrição</th><th>Categoria</th><th style="text-align:right">Valor</th></tr></thead>
-          <tbody id="imp-body"></tbody>
-        </table></div>
-        <div class="imp-actions"><button class="primary" type="button" id="imp-ok"></button><button class="ghost" type="button" id="imp-cancel">Cancelar</button></div>
-      </div>
     </section>
     <div class="cols">
       <form class="panel" id="form" novalidate>
@@ -328,6 +378,7 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
       </div>
       <p class="cmp" id="g-cmp"></p>
     </section>
+    <section class="panel" id="g-metas" hidden></section>
     <div class="cols">
 <section class="panel chart" id="ch-gastos">
       <div class="panel-head">
@@ -389,6 +440,35 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
       </div>
       <div id="r-list"></div>
     </section>
+  </section>
+
+  <!-- METAS -->
+  <section class="view" data-view="metas" hidden>
+    <div class="bar-top">
+      <a class="back" href="#inicio"><img src="{{LOGO}}" alt="">‹ Início</a>
+    </div>
+    <div>
+      <h1 class="page-title">Metas</h1>
+      <p class="page-sub">Escolha um objetivo. O app calcula quanto guardar e mostra onde ajustar seus gastos para chegar lá.</p>
+    </div>
+    <div class="metas">
+      <div class="side">
+        <section class="panel">
+          <div class="panel-head"><h2>Suas metas</h2><button class="ghost" type="button" id="mt-nova">+ Nova meta</button></div>
+          <div id="mt-lista"></div>
+        </section>
+        <form class="panel" id="mt-form" novalidate hidden>
+          <h2 id="mt-form-tit">Nova meta</h2>
+          <div class="field"><label for="mt-nome">Nome da meta</label><input id="mt-nome" placeholder="Ex.: Reserva de emergência, Viagem, Carro" autocomplete="off"></div>
+          <div class="field"><label for="mt-alvo">Quanto quer juntar</label><div class="money"><span>R$</span><input id="mt-alvo" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
+          <div class="field"><label for="mt-atual">Quanto já tem guardado para ela</label><div class="money"><span>R$</span><input id="mt-atual" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
+          <div class="field"><label for="mt-prazo">Até quando</label><input type="month" id="mt-prazo"></div>
+          <p class="err" id="mt-err" hidden></p>
+          <div class="imp-actions"><button class="primary" type="submit" id="mt-salvar">Salvar meta</button><button class="ghost" type="button" id="mt-cancelar">Cancelar</button></div>
+        </form>
+      </div>
+      <div class="proj-out" id="mt-det"></div>
+    </div>
   </section>
 
   <!-- PROJEÇÃO -->
@@ -470,6 +550,26 @@ input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 
       </div>
     </div>
   </section>
+    <section class="panel imp-panel" id="imp" hidden>
+      <input type="file" id="imp-file" class="sr-only" accept=".ofx,.csv,.txt">
+      <label class="drop" id="drop" for="imp-file">
+        <span class="drop-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14"/></svg></span>
+        <span class="drop-txt"><b>Importar extrato do Inter</b><small>Arraste o arquivo .ofx ou .csv para cá ou clique para escolher</small></span>
+      </label>
+      <details class="imp-how"><summary>Como exportar o extrato no Inter?</summary>
+        <p class="imp-help">No app ou no Internet Banking do Inter, abra o <b>Extrato</b>, escolha o período e use a opção de exportar. Baixe em <b>OFX</b> ou <b>CSV</b> (PDF não serve). Lançamentos que já estão no app são reconhecidos e não entram duplicados.</p>
+      </details>
+      <p class="err" id="imp-err" hidden></p>
+      <div id="imp-prev" hidden style="display:grid;gap:12px">
+        <div class="imp-row"><p class="imp-sum" id="imp-sum"></p>
+          <div class="filters"><button class="chip" type="button" id="imp-all">Marcar todos</button><button class="chip" type="button" id="imp-none">Desmarcar todos</button></div></div>
+        <div class="tbl"><table>
+          <thead><tr><th></th><th>Data</th><th>Descrição</th><th>Categoria</th><th style="text-align:right">Valor</th></tr></thead>
+          <tbody id="imp-body"></tbody>
+        </table></div>
+        <div class="imp-actions"><button class="primary" type="button" id="imp-ok"></button><button class="ghost" type="button" id="imp-cancel">Cancelar</button></div>
+      </div>
+    </section>
 </div>
 
 <div class="toast" id="toast" hidden><span id="toast-msg"></span><button id="undo">Desfazer</button></div>
@@ -492,36 +592,11 @@ const signed = v => `${v >= 0 ? "+" : "−"} ${brl.format(Math.abs(v))}`;
 const KEY = "junkes-finance-v1";
 const $ = id => document.getElementById(id);
 
-function exemplos() {
-  const t = new Date(), y = t.getFullYear(), m = t.getMonth();
-  const d = (mo, day) => iso(new Date(y, m + mo, day));
-  const raw = [
-    ["entrada", 6200, "Salário", "Salário", "Transferência", 0, 5],
-    ["saida", 1850, "Aluguel", "Moradia", "Boleto", 0, 5],
-    ["saida", 642.37, "Mercado do mês", "Alimentação", "Débito", 0, 3],
-    ["saida", 89.9, "Internet fibra", "Moradia", "Boleto", 0, 4],
-    ["saida", 55.9, "Streaming", "Assinaturas", "Crédito", 0, 2],
-    ["saida", 38.5, "Uber até o centro", "Transporte", "Pix", 0, 4],
-    ["entrada", 950, "Projeto de logo", "Freelance", "Pix", 0, 2],
-    ["saida", 120, "Farmácia", "Saúde", "Pix", 0, 1],
-    ["saida", 74.6, "Jantar com amigos", "Lazer", "Crédito", 0, 1],
-    ["saida", 230, "Gasolina", "Transporte", "Débito", 0, 6],
-    ["saida", 18.5, "Café e pão", "Alimentação", "Pix", 0, 6],
-    ["entrada", 6200, "Salário", "Salário", "Transferência", -1, 5],
-    ["saida", 1850, "Aluguel", "Moradia", "Boleto", -1, 5],
-    ["saida", 710.2, "Mercado do mês", "Alimentação", "Débito", -1, 8],
-    ["saida", 299, "Curso de inglês", "Educação", "Crédito", -1, 10],
-    ["saida", 180, "Show", "Lazer", "Pix", -1, 18],
-    ["saida", 96.4, "Padaria e feira", "Alimentação", "Pix", -1, 22],
-    ["saida", 412.8, "Revisão do carro", "Transporte", "Crédito", -1, 27],
-    ["entrada", 48.12, "Rendimento CDB", "Rendimentos", "Transferência", -1, 30]
-  ];
-  return raw.map((r, i) => ({ id: "ex" + i, tipo: r[0], valor: r[1], desc: r[2], cat: r[3], forma: r[4], data: d(r[5], r[6]), exemplo: true }));
-}
-
 let txs;
 try { txs = JSON.parse(localStorage.getItem(KEY)); } catch (e) { txs = null; }
-if (!Array.isArray(txs)) txs = exemplos();
+if (!Array.isArray(txs)) txs = [];
+// Remove os lançamentos de exemplo de versões anteriores
+if (txs.some(t => t.exemplo)) { txs = txs.filter(t => !t.exemplo); try { localStorage.setItem(KEY, JSON.stringify(txs)); } catch (e) {} }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(txs)); } catch (e) {} };
 
 const hoje = new Date();
@@ -582,8 +657,7 @@ function rotulo(ini, fim, periodo = window.periodo) {
 }
 
 function render() {
-  const anyEx = txs.some(t => t.exemplo);
-  $("notice").hidden = !anyEx;
+  $("notice").hidden = txs.length > 0;
   const total = txs.filter(t => t.data <= hojeIso).reduce((s, t) => s + (t.tipo === "entrada" ? t.valor : -t.valor), 0);
   const mesAtual = txs.filter(doMes(hoje.getFullYear(), hoje.getMonth()));
   const entM = soma(mesAtual, "entrada"), saiM = soma(mesAtual, "saida");
@@ -625,6 +699,7 @@ function render() {
       : `<b>${Math.abs(dif).toFixed(0)}% ${dif < 0 ? "a menos" : "a mais"}</b> que em ${nomeAnt} (${brl.format(gAnt)}).`;
   } else $("g-cmp").textContent = gTot > 0 ? `Sem gastos registrados em ${nomeAnt} para comparar.` : "Nenhum gasto registrado neste mês.";
   renderCharts();
+  if (typeof renderMetasResumo === "function") renderMetasResumo();
   $("g-list").innerHTML = lista(saidas, "Nenhuma saída neste mês.");
 
   /* Resumo */
@@ -850,33 +925,12 @@ $("imp-none").addEventListener("click", () => { pend.forEach(t => t.on = false);
 $("imp-cancel").addEventListener("click", () => { pend = []; renderImport(); });
 $("imp-ok").addEventListener("click", () => {
   const sel = pend.filter(t => t.on), stamp = Date.now();
-  const novos = sel.map((t, i) => ({ id: `i${stamp}-${i}`, tipo: t.tipo, valor: t.valor, desc: t.desc, cat: t.cat, forma: t.forma, data: t.data, fitid: t.fitid || undefined, origem: "Inter", exemplo: pendExemplo || undefined }));
+  const novos = sel.map((t, i) => ({ id: `i${stamp}-${i}`, tipo: t.tipo, valor: t.valor, desc: t.desc, cat: t.cat, forma: t.forma, data: t.data, fitid: t.fitid || undefined, origem: "Inter" }));
   txs.push(...novos);
   pend = []; save(); render(); renderImport();
   const ids = new Set(novos.map(t => t.id));
   toast(`${novos.length} lançamento${novos.length > 1 ? "s" : ""} importado${novos.length > 1 ? "s" : ""} do Inter.`, () => { txs = txs.filter(t => !ids.has(t.id)); });
 });
-$("imp-demo").addEventListener("click", () => {
-  const y = hoje.getFullYear(), m = hoje.getMonth(), d = n => { const x = new Date(y, m, n); return `${pad(x.getDate())}/${pad(x.getMonth() + 1)}/${x.getFullYear()}`; };
-  const csv = [
-    "Extrato Conta Corrente", "Conta ;00000000-0", `Período ;${d(1)} a ${d(hoje.getDate())}`, "",
-    "Data Lançamento;Histórico;Descrição;Valor;Saldo",
-    `${d(hoje.getDate())};Compra no débito;IFOOD *RESTAURANTE SABOR;-47,90;0,00`,
-    `${d(hoje.getDate())};Pix enviado;Posto Ipiranga Centro;-150,00;0,00`,
-    `${d(Math.max(1, hoje.getDate() - 1))};Pix recebido;Ana Paula Ribeiro;250,00;0,00`,
-    `${d(Math.max(1, hoje.getDate() - 1))};Compra no débito;DROGARIA RAIA 123;-36,45;0,00`,
-    `${d(Math.max(1, hoje.getDate() - 2))};Pagamento efetuado;CELESC DISTRIBUICAO;-187,32;0,00`,
-    `${d(Math.max(1, hoje.getDate() - 3))};Compra no débito;NETFLIX.COM;-44,90;0,00`,
-    `${d(Math.max(1, hoje.getDate() - 3))};Compra no débito;SUPERMERCADO BISTEK;-312,68;0,00`,
-    `${d(Math.max(1, hoje.getDate() - 4))};Rendimento;CDB Inter Liquidez Diária;12,47;0,00`,
-    `${d(Math.max(1, hoje.getDate() - 5))};Pix enviado;Uber do Brasil;-23,80;0,00`,
-    `${d(1)};Compra no débito;CINEMARK SHOPPING;-58,00;0,00`
-  ].join("\n");
-  $("imp-err").hidden = true;
-  prepararImport(lerCSV(csv), true);
-  $("imp-prev").scrollIntoView({ behavior: "smooth", block: "nearest" });
-});
-
 /* ===== Projeção ===== */
 const brlC = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 });
 const PJ_KEY = "junkes-finance-proj";
@@ -1031,13 +1085,294 @@ const escolherPct = tr => { if (tr) { pj.pct = +tr.dataset.v; renderProj(); } };
 $("pj-cmp").addEventListener("click", e => escolherPct(e.target.closest("tr")));
 $("pj-cmp").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); escolherPct(e.target.closest("tr")); } });
 
+/* ===== Metas ===== */
+const MT_KEY = "junkes-finance-metas", IA_KEY = "junkes-finance-conselhos";
+let metas = [], metaSel = null, conselhos = {}, editando = null, iaCarregando = false;
+try { metas = JSON.parse(localStorage.getItem(MT_KEY)) || []; } catch (e) {}
+try { conselhos = JSON.parse(localStorage.getItem(IA_KEY)) || {}; } catch (e) {}
+try { metaSel = localStorage.getItem(MT_KEY + "-sel"); } catch (e) {}
+const saveMetas = () => { try { localStorage.setItem(MT_KEY, JSON.stringify(metas)); localStorage.setItem(MT_KEY + "-sel", metaSel || ""); localStorage.setItem(IA_KEY, JSON.stringify(conselhos)); } catch (e) {} };
+const metaAtiva = () => metas.find(m => m.id === metaSel) || metas[0] || null;
+
+/* Quanto o corte de cada categoria pode chegar, em % do gasto médio */
+const FLEX = { "Lazer": 0.5, "Assinaturas": 0.5, "Outros": 0.3, "Alimentação": 0.25, "Transporte": 0.2, "Educação": 0.1, "Saúde": 0.05, "Moradia": 0 };
+
+function historico() {
+  // Usa os últimos 3 meses fechados com lançamentos; sem eles, o mês atual.
+  let meses = [];
+  for (let k = 1; k <= 6 && meses.length < 3; k++) {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() - k, 1);
+    const l = txs.filter(doMes(d.getFullYear(), d.getMonth()));
+    if (l.length) meses.push(l);
+  }
+  let parcial = false;
+  if (!meses.length) { const l = txs.filter(doMes(hoje.getFullYear(), hoje.getMonth())); if (l.length) { meses = [l]; parcial = true; } }
+  const n = meses.length;
+  if (!n) return null;
+  const todos = meses.flat();
+  const renda = soma(todos, "entrada") / n, gasto = soma(todos, "saida") / n;
+  const porCat = {};
+  todos.filter(t => t.tipo === "saida").forEach(t => porCat[t.cat] = (porCat[t.cat] || 0) + t.valor / n);
+  const porLocal = {};
+  todos.filter(t => t.tipo === "saida").forEach(t => {
+    const k = t.desc.trim().toLowerCase().slice(0, 40);
+    const o = porLocal[k] = porLocal[k] || { descricao: t.desc.slice(0, 40), categoria: t.cat, totalPorMes: 0, vezesPorMes: 0 };
+    o.totalPorMes += t.valor / n; o.vezesPorMes += 1 / n;
+  });
+  return { n, parcial, renda, gasto, sobra: renda - gasto, porCat, porLocal };
+}
+function mesesAte(prazo) {
+  const [y, m] = prazo.split("-").map(Number);
+  return Math.max(1, (y - hoje.getFullYear()) * 12 + (m - 1 - hoje.getMonth()) + 1);
+}
+const arred = v => Math.max(0, Math.round(v / 10) * 10);
+function planoMeta(meta) {
+  const h = historico();
+  const meses = mesesAte(meta.prazo), falta = Math.max(0, meta.alvo - meta.atual);
+  const necessario = falta / meses;
+  const base = { meses, falta, necessario, h };
+  if (falta === 0) return { ...base, status: "ok", rotulo: "Meta alcançada", acoes: [], limites: [] };
+  if (!h) return { ...base, status: "neutro", rotulo: "Sem dados", acoes: [], limites: [] };
+  const gap = necessario - h.sobra;
+  const cats = Object.entries(h.porCat).sort((a, b) => b[1] - a[1]);
+  const cortavel = cats.map(([c, v]) => [c, v, v * (FLEX[c] ?? 0.2)]);
+  const totalCortavel = cortavel.reduce((s, x) => s + x[2], 0);
+  const fator = gap > 0 && totalCortavel > 0 ? Math.min(1, gap / totalCortavel) : 0;
+  const limites = cortavel.map(([c, v, max]) => ({ cat: c, media: v, limite: arred(v - max * fator), corte: max * fator }));
+  const acoes = limites.filter(l => l.corte >= 5).sort((a, b) => b.corte - a.corte);
+  const faltaMes = Math.max(0, gap - totalCortavel);
+  let status, rotulo;
+  if (gap <= 0) { status = "ok"; rotulo = "No caminho"; }
+  else if (faltaMes <= 0) { status = "ajuste"; rotulo = "Dá com ajustes"; }
+  else { status = "dificil"; rotulo = "Prazo apertado"; }
+  const capacidade = h.sobra + totalCortavel;
+  const prazoViavel = faltaMes > 0 && capacidade > 0 ? Math.ceil(falta / capacidade) : null;
+  return { ...base, gap, status, rotulo, limites, acoes, faltaMes, prazoViavel, capacidade };
+}
+const nomePrazo = prazo => { const [y, m] = prazo.split("-").map(Number); return new Date(y, m - 1, 1).toLocaleDateString("pt-BR", { month: "short", year: "numeric" }).replace(".", ""); };
+
+function limitesHTML(p, titulo) {
+  const mesAtual = txs.filter(t => t.tipo === "saida" && doMes(hoje.getFullYear(), hoje.getMonth())(t));
+  const gastoCat = {};
+  mesAtual.forEach(t => gastoCat[t.cat] = (gastoCat[t.cat] || 0) + t.valor);
+  const diasMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+  const itens = p.limites.filter(l => l.limite > 0 || gastoCat[l.cat]);
+  if (!itens.length) return "";
+  return `<div class="panel-head"><h2>${titulo}</h2><span class="label">Dia ${hoje.getDate()} de ${diasMes}</span></div>
+    <ul class="lim">${itens.map(l => {
+      const g = gastoCat[l.cat] || 0, pct = l.limite ? g / l.limite * 100 : 100;
+      const cls = pct > 100 ? "estourou" : pct > 80 ? "alerta" : "";
+      return `<li><div class="line"><span>${l.cat}</span><span class="${pct > 100 ? "estourou" : ""}">${brl.format(g)} de ${brl.format(l.limite)}${pct > 100 ? " · passou " + brl.format(g - l.limite) : ""}</span></div>
+        <div class="bar"><i class="${cls}" style="width:${Math.min(pct, 100)}%"></i></div></li>`;
+    }).join("")}</ul>`;
+}
+
+function renderMetas() {
+  $("mt-lista").innerHTML = metas.length ? metas.map(m => {
+    const pct = Math.min(100, m.atual / m.alvo * 100), p = planoMeta(m);
+    return `<button type="button" class="mt-card" data-id="${m.id}" aria-pressed="${m === metaAtiva()}">
+      <div class="row"><span>${esc(m.nome)}</span><span>${pct.toFixed(0)}%</span></div>
+      <div class="prog"><i style="width:${pct}%"></i></div>
+      <div class="row"><small>${brl.format(m.atual)} de ${brl.format(m.alvo)}</small><span class="pill ${p.status}">${p.rotulo}</span></div>
+    </button>`;
+  }).join("") : `<p class="empty">Você ainda não tem metas. Crie a primeira em "+ Nova meta".</p>`;
+  if (!metas.length && !editando) abrirForm(null);
+
+  const m = metaAtiva(), det = $("mt-det");
+  if (!m) { det.innerHTML = `<section class="panel"><p class="empty">Crie uma meta para ver quanto precisa guardar por mês e onde ajustar seus gastos.</p></section>`; return; }
+  const p = planoMeta(m), h = p.h;
+  let msg;
+  if (p.falta === 0) msg = `Você já juntou o valor desta meta. Parabéns!`;
+  else if (!h) msg = `Para chegar lá, guarde <b>${brl.format(p.necessario)} por mês</b> até ${nomePrazo(m.prazo)}. Importe seu extrato do Inter para o app comparar com o que sobra hoje e sugerir onde cortar.`;
+  else if (p.status === "ok") msg = `Você precisa guardar <b>${brl.format(p.necessario)} por mês</b> e hoje sobra em média <b>${brl.format(h.sobra)}</b>. Mantenha os gastos nos limites abaixo e separe esse valor assim que receber.`;
+  else if (p.status === "ajuste") msg = `Você precisa guardar <b>${brl.format(p.necessario)} por mês</b>, mas hoje sobra em média <b>${brl.format(h.sobra)}</b>. Faltam <b>${brl.format(p.gap)} por mês</b>, e dá para cobrir com os ajustes abaixo.`;
+  else msg = `Você precisa guardar <b>${brl.format(p.necessario)} por mês</b>, mas hoje sobra em média <b>${brl.format(h.sobra)}</b>. Mesmo com os cortes abaixo, ainda faltariam <b>${brl.format(p.faltaMes)} por mês</b>.${p.prazoViavel ? ` Com os cortes, a meta fica viável em <b>${duracao(p.prazoViavel)}</b>.` : ""}`;
+  if (h && h.parcial) msg += ` <span class="hint">Análise feita só com o mês atual. Fica mais precisa com mais meses de extrato.</span>`;
+
+  const acoesHTML = p.acoes.length ? `<section class="panel"><div class="panel-head"><h2>Onde ajustar seus gastos</h2></div>
+    <ul class="acoes">${p.acoes.map(a => `<li><span class="dot" style="background:${color("saida", a.cat)}"></span>
+      <span>${a.cat}<small>Média de ${brl.format(a.media)} por mês. Novo limite: ${brl.format(a.limite)}</small></span>
+      <span class="eco">− ${brl.format(a.corte)}/mês</span></li>`).join("")}</ul></section>` : "";
+  const lim = h ? limitesHTML(p, "Limites deste mês") : "";
+
+  det.innerHTML = `
+    <section class="summary" style="grid-template-columns:minmax(0,1fr)">
+      <div class="mt-head"><h2>${esc(m.nome)}</h2><span class="pill ${p.status}">${p.rotulo}</span></div>
+      <div class="prog" style="height:12px"><i style="width:${Math.min(100, m.atual / m.alvo * 100)}%"></i></div>
+      <div class="mt-nums">
+        <div><div class="label">Faltam</div><div class="val">${brl.format(p.falta)}</div></div>
+        <div><div class="label">Prazo</div><div class="val">${nomePrazo(m.prazo)}</div></div>
+        <div><div class="label">Guardar por mês</div><div class="val">${brl.format(p.necessario)}</div></div>
+      </div>
+      <p class="mt-msg">${msg}</p>
+      <div class="mt-tools">
+        <div class="field"><label for="mt-add">Guardei mais (R$)</label><input id="mt-add" inputmode="decimal" placeholder="0,00" autocomplete="off"></div>
+        <button class="ghost" type="button" id="mt-add-ok" style="align-self:end">Somar à meta</button>
+        <button class="ghost" type="button" id="mt-editar" style="align-self:end">Editar</button>
+        <button class="ghost" type="button" id="mt-excluir" style="align-self:end">Excluir</button>
+      </div>
+    </section>
+    ${acoesHTML}
+    ${lim ? `<section class="panel">${lim}</section>` : ""}
+    <section class="panel ia-box" id="ia-box"></section>`;
+  renderIA();
+}
+
+/* ----- IA ----- */
+function md(texto) {
+  const linhas = esc(texto).split(/\r?\n/);
+  let html = "", lista = false;
+  const inline = s => s.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  for (const l of linhas) {
+    const t = l.trim();
+    if (/^[-*] /.test(t)) { if (!lista) { html += "<ul>"; lista = true; } html += `<li>${inline(t.slice(2))}</li>`; continue; }
+    if (lista) { html += "</ul>"; lista = false; }
+    if (/^#{1,4} /.test(t)) html += `<h3>${inline(t.replace(/^#+ /, ""))}</h3>`;
+    else if (t) html += `<p>${inline(t)}</p>`;
+  }
+  if (lista) html += "</ul>";
+  return html;
+}
+function resumoIA(m) {
+  const p = planoMeta(m), h = p.h;
+  const mesAtual = txs.filter(t => t.tipo === "saida" && doMes(hoje.getFullYear(), hoje.getMonth())(t));
+  const gastoMes = {};
+  mesAtual.forEach(t => gastoMes[t.cat] = (gastoMes[t.cat] || 0) + t.valor);
+  const r2 = v => Math.round(v * 100) / 100;
+  return {
+    hoje: hojeIso,
+    meta: { nome: m.nome, valorAlvo: m.alvo, jaGuardado: m.atual, prazo: m.prazo, mesesRestantes: p.meses, faltaJuntar: r2(p.falta), precisaGuardarPorMes: r2(p.necessario) },
+    historico: {
+      mesesAnalisados: h.n, apenasMesAtualParcial: h.parcial,
+      rendaMediaMensal: r2(h.renda), gastoMedioMensal: r2(h.gasto), sobraMediaMensal: r2(h.sobra),
+      gastoMedioPorCategoria: Object.fromEntries(Object.entries(h.porCat).sort((a, b) => b[1] - a[1]).map(([c, v]) => [c, r2(v)])),
+      maioresGastosPorEstabelecimento: Object.values(h.porLocal).sort((a, b) => b.totalPorMes - a.totalPorMes).slice(0, 20)
+        .map(o => ({ descricao: o.descricao, categoria: o.categoria, mediaPorMes: r2(o.totalPorMes), vezesPorMes: Math.round(o.vezesPorMes * 10) / 10 }))
+    },
+    gastoNoMesAtualAteHoje: Object.fromEntries(Object.entries(gastoMes).map(([c, v]) => [c, r2(v)])),
+    planoCalculadoPeloApp: p.limites.map(l => ({ categoria: l.cat, mediaAtual: r2(l.media), limiteSugerido: l.limite }))
+  };
+}
+async function renderIA() {
+  const box = $("ia-box"); if (!box) return;
+  const m = metaAtiva();
+  const head = `<div class="panel-head"><h2>Conselhos da IA</h2></div>`;
+  if (!window.junkes) { box.innerHTML = head + `<p class="empty">Os conselhos da IA estão disponíveis no aplicativo para Windows.</p>`; return; }
+  const st = await window.junkes.ia.status();
+  if (!st.temChave) {
+    box.innerHTML = head + `<div class="ia-chave">
+      <p class="mt-msg">A IA (Claude, da Anthropic) lê o resumo dos seus gastos e da meta e escreve um plano personalizado. Para usar, cole sua chave da API da Anthropic. Você cria uma em <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>. Cada análise custa alguns centavos de dólar, cobrados na sua conta da Anthropic.</p>
+      <div class="row"><input id="ia-chave" type="password" placeholder="sk-ant-..." autocomplete="off" aria-label="Chave da API da Anthropic"><button class="primary" type="button" id="ia-salvar" style="padding:9px 20px">Salvar chave</button></div>
+      <p class="hint">A chave fica guardada criptografada neste computador.</p>
+      <p class="err" id="ia-err" hidden></p></div>`;
+    return;
+  }
+  const c = m && conselhos[m.id];
+  const semDados = !historico();
+  box.innerHTML = head + `
+    ${iaCarregando ? `<p class="carregando">A IA está analisando seus gastos. Isso leva alguns segundos.</p>` : ""}
+    ${!iaCarregando && c ? `<div class="ia-txt">${md(c.texto)}</div><p class="ia-meta">Análise de ${new Date(c.data).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}. Revise antes de seguir: a IA pode errar.</p>` : ""}
+    ${!iaCarregando && !c ? `<p class="mt-msg">${semDados ? "Importe seu extrato primeiro. A IA precisa dos seus gastos para dar conselhos." : "Peça uma análise para receber um plano personalizado para esta meta."}</p>` : ""}
+    <p class="err" id="ia-err" hidden></p>
+    <div class="imp-actions">
+      <button class="primary" type="button" id="ia-pedir" ${iaCarregando || semDados || !m || m.atual >= m.alvo ? "disabled" : ""}>${c ? "Pedir nova análise" : "Pedir análise à IA"}</button>
+      <button class="link-btn" type="button" id="ia-remover">Remover chave da API</button>
+    </div>
+    <p class="hint">São enviados à Anthropic apenas os totais por categoria, os nomes dos estabelecimentos onde você mais gasta e os dados da meta.</p>`;
+}
+async function pedirIA() {
+  const m = metaAtiva(); if (!m || iaCarregando) return;
+  iaCarregando = true; renderIA();
+  const r = await window.junkes.ia.aconselhar(resumoIA(m));
+  iaCarregando = false;
+  if (r.ok) { conselhos[m.id] = { texto: r.texto, data: new Date().toISOString() }; saveMetas(); }
+  await renderIA();
+  if (!r.ok) { $("ia-err").textContent = r.erro; $("ia-err").hidden = false; }
+}
+
+/* ----- Formulário e ações ----- */
+function abrirForm(meta) {
+  editando = meta ? meta.id : "nova";
+  $("mt-form").hidden = false;
+  $("mt-form-tit").textContent = meta ? "Editar meta" : "Nova meta";
+  $("mt-nome").value = meta ? meta.nome : "";
+  $("mt-alvo").value = meta ? numBR(meta.alvo) : "";
+  $("mt-atual").value = meta && meta.atual ? numBR(meta.atual) : "";
+  const d = new Date(hoje.getFullYear() + 1, hoje.getMonth(), 1);
+  $("mt-prazo").value = meta ? meta.prazo : `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+  $("mt-prazo").min = `${hoje.getFullYear()}-${pad(hoje.getMonth() + 1)}`;
+  $("mt-err").hidden = true;
+  $("mt-cancelar").hidden = !metas.length;
+}
+function fecharForm() { editando = null; $("mt-form").hidden = true; }
+$("mt-nova").addEventListener("click", () => { abrirForm(null); $("mt-nome").focus(); });
+$("mt-cancelar").addEventListener("click", fecharForm);
+$("mt-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const nome = $("mt-nome").value.trim(), alvo = parseValor($("mt-alvo").value), atual = parseValor($("mt-atual").value) || 0, prazo = $("mt-prazo").value;
+  const minimo = `${hoje.getFullYear()}-${pad(hoje.getMonth() + 1)}`;
+  const err = !nome ? "Dê um nome para a meta, como Viagem ou Reserva de emergência."
+    : !(alvo > 0) ? "Informe quanto você quer juntar, como 10.000,00."
+    : atual < 0 ? "O valor já guardado não pode ser negativo."
+    : !prazo || prazo < minimo ? "Escolha um mês a partir deste para o prazo." : "";
+  $("mt-err").textContent = err; $("mt-err").hidden = !err;
+  if (err) return;
+  if (editando && editando !== "nova") {
+    const m = metas.find(x => x.id === editando);
+    Object.assign(m, { nome, alvo: Math.round(alvo * 100) / 100, atual: Math.round(atual * 100) / 100, prazo });
+    delete conselhos[m.id];
+  } else {
+    const m = { id: "m" + Date.now(), nome, alvo: Math.round(alvo * 100) / 100, atual: Math.round(atual * 100) / 100, prazo, criada: hojeIso };
+    metas.push(m); metaSel = m.id;
+  }
+  fecharForm(); saveMetas(); renderMetas(); render();
+});
+$("mt-lista").addEventListener("click", e => {
+  const b = e.target.closest(".mt-card"); if (!b) return;
+  metaSel = b.dataset.id; saveMetas(); renderMetas(); render();
+});
+$("mt-det").addEventListener("click", async e => {
+  const m = metaAtiva(); if (!m) return;
+  const id = e.target.id;
+  if (id === "mt-add-ok") {
+    const v = parseValor($("mt-add").value); if (!(v > 0)) { $("mt-add").focus(); return; }
+    m.atual = Math.round((m.atual + v) * 100) / 100; saveMetas(); renderMetas(); render();
+    toast(`${brl.format(v)} somados à meta "${m.nome}".`, () => { m.atual = Math.round((m.atual - v) * 100) / 100; saveMetas(); renderMetas(); });
+  } else if (id === "mt-editar") { abrirForm(m); $("mt-nome").focus(); }
+  else if (id === "mt-excluir") {
+    const i = metas.indexOf(m); metas.splice(i, 1); metaSel = metas[0] ? metas[0].id : null; saveMetas(); renderMetas(); render();
+    toast(`Meta "${m.nome}" excluída.`, () => { metas.splice(i, 0, m); metaSel = m.id; saveMetas(); renderMetas(); });
+  } else if (id === "ia-pedir") pedirIA();
+  else if (id === "ia-salvar") {
+    const r = await window.junkes.ia.salvarChave($("ia-chave").value);
+    if (r.ok) renderIA(); else { $("ia-err").textContent = r.erro; $("ia-err").hidden = false; }
+  } else if (id === "ia-remover") { await window.junkes.ia.removerChave(); renderIA(); }
+});
+
+/* Capa e tela Gastos */
+function renderMetasResumo() {
+  const m = metaAtiva();
+  $("p-metas").textContent = m ? `${m.nome} · ${Math.min(100, m.atual / m.alvo * 100).toFixed(0)}%` : "Criar minha primeira meta";
+  const box = $("g-metas");
+  if (!m || m.atual >= m.alvo) { box.hidden = true; return; }
+  const p = planoMeta(m);
+  const html = p.h ? limitesHTML(p, `Limites para a meta "${esc(m.nome)}"`) : "";
+  box.hidden = !html;
+  if (html) box.innerHTML = html + `<a class="link-btn" href="#metas">Ver o plano completo</a>`;
+}
+
 /* Navegação entre telas */
-const VIEWS = ["inicio", "saldo", "gastos", "resumo", "projecao"];
+const VIEWS = ["inicio", "saldo", "gastos", "resumo", "projecao", "metas"];
 function rota() {
   const v = location.hash.slice(1);
   const atual = VIEWS.includes(v) ? v : "inicio";
   document.querySelectorAll(".view").forEach(s => s.hidden = s.dataset.view !== atual);
   if (atual === "projecao") renderProj();
+  if (atual === "metas") renderMetas();
+  // Importação do extrato no topo de cada página
+  const imp = $("imp");
+  if (atual === "inicio") imp.hidden = true;
+  else { document.querySelector(`[data-view="${atual}"] .bar-top`).nextElementSibling.after(imp); imp.hidden = false; }
   window.scrollTo(0, 0);
 }
 window.addEventListener("hashchange", rota);
@@ -1093,7 +1428,6 @@ document.addEventListener("click", e => {
   save(); render();
   toast(`"${removido.desc}" excluído.`, () => txs.push(removido));
 });
-$("clear-ex").addEventListener("click", () => { txs = txs.filter(t => !t.exemplo); save(); render(); });
 
 /* Gastos: mês */
 $("g-prev").addEventListener("click", () => { gMes.m--; if (gMes.m < 0) { gMes.m = 11; gMes.y--; } render(); });

@@ -1,6 +1,6 @@
 # Junkes Finance
 
-Controle financeiro pessoal para Windows: saldo, gastos por categoria, resumo por dia, semana e mês, importação do extrato do Inter (OFX/CSV) e projeção de investimentos.
+Controle financeiro pessoal para Windows: saldo, gastos por categoria, resumo por dia, semana e mês, importação do extrato do Inter (OFX/CSV), projeção de investimentos e metas com plano de gastos e conselhos da IA.
 
 Os dados ficam salvos só no computador. Use **Fazer backup** na capa de vez em quando.
 
@@ -10,6 +10,13 @@ Baixe o `Junkes-Finance-Setup-<versão>.exe` mais recente em **Releases** e abra
 Na primeira vez o Windows pode mostrar "O Windows protegeu o computador": clique em **Mais informações → Executar assim mesmo**.
 
 Depois disso, o app se atualiza sozinho: ao abrir, ele procura uma versão nova, baixa e pergunta se você quer reiniciar.
+
+## Conselhos da IA (Metas)
+
+A aba **Metas** calcula quanto guardar por mês e sugere limites por categoria sem precisar de internet.
+O botão **Pedir análise à IA** usa o Claude (Anthropic) e precisa de uma chave da API, criada em console.anthropic.com. A chave fica criptografada no computador (`chave-ia.bin` na pasta de dados do app) e cada análise é cobrada na conta da Anthropic.
+
+São enviados apenas: totais por categoria, os 20 estabelecimentos com mais gastos e os dados da meta. O código fica em `app/ia.js`.
 
 ## Publicar uma nova versão
 
@@ -27,6 +34,7 @@ O GitHub Actions percebe o número novo, monta o instalador num Windows e public
 | `src/base.css` | Cores, fontes e estilos base |
 | `assets/` | Logo e fonte Alice (funciona sem internet) |
 | `app/main.js` | Janela do Windows e atualização automática |
+| `app/ia.js` / `app/preload.js` | Conselhos da IA (Claude) e ponte segura com a página |
 | `app/icon.ico` | Ícone do app |
 | `build.js` | Gera `app/index.html` a partir de `src/` |
 | `.github/workflows/release.yml` | Monta e publica o instalador quando a versão muda |

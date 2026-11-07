@@ -32,7 +32,7 @@ html = html.replace("/* Navegação entre telas */", `/* Backup */
 const versaoApp = new URLSearchParams(location.search).get("v");
 if (versaoApp) $("versao").textContent = "Versão " + versaoApp;
 $("bk-save").addEventListener("click", () => {
-  const dados = { app: "junkes-finance", versao: 1, criadoEm: new Date().toISOString(), lancamentos: txs, projecao: pj };
+  const dados = { app: "junkes-finance", versao: 2, criadoEm: new Date().toISOString(), lancamentos: txs, projecao: pj, metas, conselhos };
   const url = URL.createObjectURL(new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" }));
   const a = document.createElement("a");
   a.href = url; a.download = "junkes-finance-backup-" + hojeIso + ".json";
@@ -47,7 +47,8 @@ $("bk-file").addEventListener("change", async e => {
     if (d.app !== "junkes-finance" || !Array.isArray(d.lancamentos)) throw new Error();
     const antes = txs, pjAntes = { ...pj };
     txs = d.lancamentos; if (d.projecao) Object.assign(pj, d.projecao);
-    save(); render(); renderProj();
+    if (Array.isArray(d.metas)) { metas = d.metas; conselhos = d.conselhos || {}; metaSel = metas[0] ? metas[0].id : null; saveMetas(); }
+    save(); render(); renderProj(); renderMetas();
     toast(d.lancamentos.length + " lançamentos restaurados do backup.", () => { txs = antes; Object.assign(pj, pjAntes); renderProj(); });
   } catch (err) { toast("Este arquivo não é um backup da Junkes Finance."); }
 });

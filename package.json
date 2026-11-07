@@ -1,7 +1,7 @@
 {
   "name": "junkes-finance",
   "productName": "Junkes Finance",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Controle financeiro pessoal",
   "author": "Thiago Junkes",
   "license": "UNLICENSED",
@@ -14,6 +14,7 @@
     "release": "npm run html && electron-builder --win --publish always"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.135.0",
     "electron-updater": "6.3.9"
   },
   "devDependencies": {
@@ -24,10 +25,22 @@
     "appId": "com.junkes.finance",
     "productName": "Junkes Finance",
     "copyright": "Thiago Junkes",
-    "files": ["app/**/*", "package.json"],
-    "directories": { "output": "dist" },
+    "files": [
+      "app/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "app/icon.ico"
     },
     "nsis": {
@@ -39,7 +52,10 @@
       "artifactName": "Junkes-Finance-Setup-${version}.${ext}",
       "deleteAppDataOnUninstall": false
     },
-    "electronLanguages": ["pt-BR", "en-US"],
+    "electronLanguages": [
+      "pt-BR",
+      "en-US"
+    ],
     "publish": {
       "provider": "github",
       "owner": "thiagojunkesoliveira-art",
