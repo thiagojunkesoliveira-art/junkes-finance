@@ -1,0 +1,50 @@
+{
+  "name": "junkes-finance",
+  "productName": "Junkes Finance",
+  "version": "1.0.0",
+  "description": "Controle financeiro pessoal",
+  "author": "Thiago Junkes",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "app/main.js",
+  "scripts": {
+    "html": "node build.js",
+    "start": "npm run html && electron .",
+    "dist": "npm run html && electron-builder --win --publish never",
+    "release": "npm run html && electron-builder --win --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "6.3.9"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "com.junkes.finance",
+    "productName": "Junkes Finance",
+    "copyright": "Thiago Junkes",
+    "files": ["app/**/*", "package.json"],
+    "directories": { "output": "dist" },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "app/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Junkes Finance",
+      "artifactName": "Junkes-Finance-Setup-${version}.${ext}",
+      "deleteAppDataOnUninstall": false
+    },
+    "electronLanguages": ["pt-BR", "en-US"],
+    "publish": {
+      "provider": "github",
+      "owner": "thiagojunkesoliveira-art",
+      "repo": "junkes-finance",
+      "releaseType": "release"
+    }
+  }
+}
